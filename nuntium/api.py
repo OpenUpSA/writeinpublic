@@ -2,8 +2,9 @@
 
 import json
 
-from tastypie.resources import ModelResource, ALL_WITH_RELATIONS, Resource
+from tastypie.resources import ModelResource, ALL_WITH_RELATIONS, ALL, Resource
 from instance.models import PopoloPerson, WriteItInstance
+from popolo.models import Identifier
 from .models import Message, Answer, \
     OutboundMessageIdentifier, OutboundMessage, Confirmation
 from tastypie.authentication import ApiKeyAuthentication
@@ -34,11 +35,26 @@ class PagePaginator(Paginator):
         return offset
 
 
+class IdentifierResource(ModelResource):
+    class Meta:
+        queryset = Identifier.objects.all()
+        resource_name = 'identifier'
+        filtering = {
+            'identifier': ALL,
+            'scheme': ALL,
+        }
+        allowed_methods = []
+
 class PersonResource(ModelResource):
+    identifiers = fields.ToManyField(IdentifierResource, 'identifiers', full=True)
+
     class Meta:
         queryset = PopoloPerson.objects.all()
         resource_name = 'person'
         authentication = ApiKeyAuthentication()
+        filtering = {
+            'identifiers': ALL_WITH_RELATIONS,
+        }
 
     def dehydrate(self, bundle):
         bundle.data['resource_uri'] = bundle.obj.uri_for_api()
