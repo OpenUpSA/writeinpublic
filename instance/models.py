@@ -75,6 +75,10 @@ class PopoloPerson(Person):
     def popolo_source_url(self):
         return self.popolo_source.url
 
+    @property
+    def contactable(self):
+        return Contact.are_there_contacts_for(self)
+
     # Note that these methods use the slightly odd implementation
     # of iterating over the relation rather than using .filter or .get
     # because if they're preloaded with prefetch_related those methods
