@@ -77,7 +77,6 @@ class PersonResource(ModelResource):
         bundle.data['resource_uri'] = bundle.obj.uri_for_api()
         bundle.data['popit_id'] = bundle.obj.old_popit_id
         bundle.data['popit_url'] = bundle.obj.uri_for_api()
-        bundle.data['contactable'] = bundle.obj.contactable
         return bundle
 
 
