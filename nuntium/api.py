@@ -12,7 +12,7 @@ from tastypie.authorization import Authorization
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf.urls import url
 from tastypie import fields
-from tastypie.exceptions import ImmediateHttpResponse
+from tastypie.exceptions import ImmediateHttpResponse, InvalidFilterError
 from tastypie import http
 from contactos.models import Contact
 from tastypie.paginator import Paginator
@@ -62,9 +62,14 @@ class PersonResource(ModelResource):
 
         filters = bundle.request.GET.copy()
         if 'contactable' in filters:
-            if filters['contactable']:
-                nb = Count('contact', filter=Q(is_bounced=False))
+            nb = Count('contact', filter=Q(is_bounced=False))
+            if filters['contactable'] == 'True':
                 result = result.annotate(not_bounced=nb).filter(not_bounced__gte=1)
+            elif filters['contactable'] == 'False':
+                result = result.annotate(not_bounced=nb).filter(not_bounced__lt=1)
+            else:
+                raise InvalidFilterError("'Contactable' field must either be 'True' or 'False'.")
+
         return result
 
 
