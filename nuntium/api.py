@@ -19,6 +19,7 @@ from tastypie.paginator import Paginator
 from django.http import Http404, HttpResponseBadRequest
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from django.db.models import Count, Q
 from tastypie.bundle import Bundle
 from tastypie.exceptions import Unauthorized
 
@@ -55,6 +56,17 @@ class PersonResource(ModelResource):
         filtering = {
             'identifiers': ALL_WITH_RELATIONS,
         }
+
+    def obj_get_list(self, bundle, **kwargs):
+        result = super(PersonResource, self).obj_get_list(bundle, **kwargs)
+
+        filters = bundle.request.GET.copy()
+        if 'contactable' in filters:
+            if filters['contactable']:
+                nb = Count('contact', filter=Q(is_bounced=False))
+                result = result.annotate(not_bounced=nb).filter(not_bounced__gte=1)
+        return result
+
 
     def dehydrate(self, bundle):
         bundle.data['resource_uri'] = bundle.obj.uri_for_api()
