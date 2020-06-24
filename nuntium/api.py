@@ -19,7 +19,6 @@ from tastypie.paginator import Paginator
 from django.http import Http404, HttpResponseBadRequest
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.db.models import Count, Q, IntegerField, Sum, Case, When
 from tastypie.bundle import Bundle
 from tastypie.exceptions import Unauthorized
 
@@ -62,12 +61,11 @@ class PersonResource(ModelResource):
 
         filters = bundle.request.GET.copy()
         if 'contactable' in filters:
-            # Count the number of non-bounced contacts the person has
-            nb = Sum(Case(When(contact__is_bounced=False, then=1), default=0, output_field=IntegerField()))
+            # Count the number of contacts the person has
             if filters['contactable'] == 'True':
-                result = result.annotate(not_bounced=nb).filter(not_bounced__gte=1)
+                result = result.has_contacts()
             elif filters['contactable'] == 'False':
-                result = result.annotate(not_bounced=nb).filter(not_bounced__lt=1)
+                result = result.doesnt_have_contacts()
             else:
                 raise InvalidFilterError("'Contactable' field must either be 'True' or 'False'.")
 

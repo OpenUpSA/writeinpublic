@@ -7,7 +7,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.db import models, transaction
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Count
 from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 
@@ -27,6 +27,13 @@ from mailit import MailChannel
 
 
 class PopoloPersonQuerySet(models.QuerySet):
+    def has_contacts(self):
+        contact_count = Count("contact")
+        return self.annotate(contact_count=contact_count).filter(contact_count__gte=1)
+
+    def doesnt_have_contacts(self):
+        contact_count = Count("contact")
+        return self.annotate(contact_count=contact_count).filter(contact_count__lt=1)
 
     def get_from_api_uri(self, uri_from_api):
         return self.get(
