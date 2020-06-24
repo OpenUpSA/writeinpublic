@@ -69,6 +69,9 @@ class PersonResource(ModelResource):
             else:
                 raise InvalidFilterError("'Contactable' field must either be 'True' or 'False'.")
 
+        if 'instance_id' in filters:
+            result = result.filter(writeit_instances__id=filters['instance_id'])
+
         return result
 
 

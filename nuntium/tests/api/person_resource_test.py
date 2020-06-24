@@ -18,6 +18,9 @@ class PersonResourceTestCase(ResourceTestCase):
         )
         self.api_client = TestApiClient()
 
+        self.person = Person.objects.create(name='Tester')
+        self.writeitinstance.add_person(self.person)
+
         self.data = {
             "format": "json",
             "username": self.user.username,
@@ -87,3 +90,12 @@ class PersonResourceTestCase(ResourceTestCase):
 
         persons = self.deserialize(response)["objects"]
         self.assertEqual(len(persons), Person.objects.doesnt_have_contacts().count())
+
+    def test_filter_list_of_persons_by_instance(self):
+        url = "/api/v1/person/?instance_id=%d" % self.writeitinstance.id
+        response = self.api_client.get(url, authentication=self.get_credentials())
+
+        self.assertValidJSONResponse(response)
+
+        persons = self.deserialize(response)["objects"]
+        self.assertEqual(len(persons), self.writeitinstance.persons.count())
