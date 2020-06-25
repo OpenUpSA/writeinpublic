@@ -62,12 +62,13 @@ class PersonResource(ModelResource):
         filters = bundle.request.GET.copy()
         if 'has_contacts' in filters:
             # Count the number of contacts the person has
-            if filters['has_contacts'] == 'True':
+            filters['has_contacts'] = filters['has_contacts'].lower()
+            if filters['has_contacts'] == 'true':
                 result = result.has_contacts()
-            elif filters['has_contacts'] == 'False':
+            elif filters['has_contacts'] == 'false':
                 result = result.doesnt_have_contacts()
             else:
-                raise InvalidFilterError("'has_contacts' field must either be 'True' or 'False'.")
+                raise InvalidFilterError("'has_contacts' field must either be 'true' or 'false'.")
 
         if 'instance_id' in filters:
             result = result.filter(writeit_instances__id=filters['instance_id'])
