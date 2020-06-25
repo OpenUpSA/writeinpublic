@@ -18,9 +18,6 @@ class PersonResourceTestCase(ResourceTestCase):
         )
         self.api_client = TestApiClient()
 
-        self.person = Person.objects.create(name='Tester')
-        self.writeitinstance.add_person(self.person)
-
         self.data = {
             "format": "json",
             "username": self.user.username,
