@@ -70,7 +70,7 @@ class PersonResourceTestCase(ResourceTestCase):
         self.assertEqual(1, len(persons))
         self.assertEqual(person.id, persons[0]["id"])
 
-    def test_filter_list_of_persons_by_is_contactable(self):
+    def test_filter_list_of_persons_by_has_contacts(self):
         url = "/api/v1/person/?has_contacts=True"
         response = self.api_client.get(url, authentication=self.get_credentials())
 
@@ -79,7 +79,7 @@ class PersonResourceTestCase(ResourceTestCase):
         persons = self.deserialize(response)["objects"]
         self.assertEqual(len(persons), Person.objects.has_contacts().count())
 
-    def test_filter_list_of_persons_by_is_not_contactable(self):
+    def test_filter_list_of_persons_by_does_not_have_contacts(self):
         url = "/api/v1/person/?has_contacts=False"
         response = self.api_client.get(url, authentication=self.get_credentials())
 
@@ -87,6 +87,12 @@ class PersonResourceTestCase(ResourceTestCase):
 
         persons = self.deserialize(response)["objects"]
         self.assertEqual(len(persons), Person.objects.doesnt_have_contacts().count())
+
+    def test_filter_invalid_has_contacts_value(self):
+        url = "/api/v1/person/?has_contacts=something-else"
+        response = self.api_client.get(url, authentication=self.get_credentials())
+
+        self.assertHttpBadRequest(response)
 
     def test_filter_list_of_persons_by_instance(self):
         url = "/api/v1/person/?instance_id=%d" % self.writeitinstance.id
