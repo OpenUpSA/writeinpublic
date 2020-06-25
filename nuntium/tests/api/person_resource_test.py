@@ -71,7 +71,7 @@ class PersonResourceTestCase(ResourceTestCase):
         self.assertEqual(person.id, persons[0]["id"])
 
     def test_filter_list_of_persons_by_is_contactable(self):
-        url = "/api/v1/person/?contactable=True"
+        url = "/api/v1/person/?has_contacts=True"
         response = self.api_client.get(url, authentication=self.get_credentials())
 
         self.assertValidJSONResponse(response)
@@ -80,7 +80,7 @@ class PersonResourceTestCase(ResourceTestCase):
         self.assertEqual(len(persons), Person.objects.has_contacts().count())
 
     def test_filter_list_of_persons_by_is_not_contactable(self):
-        url = "/api/v1/person/?contactable=False"
+        url = "/api/v1/person/?has_contacts=False"
         response = self.api_client.get(url, authentication=self.get_credentials())
 
         self.assertValidJSONResponse(response)

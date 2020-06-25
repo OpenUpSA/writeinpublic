@@ -60,14 +60,14 @@ class PersonResource(ModelResource):
         result = super(PersonResource, self).obj_get_list(bundle, **kwargs)
 
         filters = bundle.request.GET.copy()
-        if 'contactable' in filters:
+        if 'has_contacts' in filters:
             # Count the number of contacts the person has
-            if filters['contactable'] == 'True':
+            if filters['has_contacts'] == 'True':
                 result = result.has_contacts()
-            elif filters['contactable'] == 'False':
+            elif filters['has_contacts'] == 'False':
                 result = result.doesnt_have_contacts()
             else:
-                raise InvalidFilterError("'Contactable' field must either be 'True' or 'False'.")
+                raise InvalidFilterError("'has_contacts' field must either be 'True' or 'False'.")
 
         if 'instance_id' in filters:
             result = result.filter(writeit_instances__id=filters['instance_id'])
