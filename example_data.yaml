@@ -89,7 +89,14 @@
     deleted_from_source: false
     content_type: [popolo, person]
     object_id: 3
-  pk: 2
+  pk: 3
+- model: popolo_sources.linktopopolosource
+  fields:
+    popolo_source: 2
+    deleted_from_source: false
+    content_type: [popolo, person]
+    object_id: 4
+  pk: 4
 
 
 - fields: {name: Pedro}
@@ -101,6 +108,9 @@
 - fields: {name: Felipe}
   model: popolo.person
   pk: 3
+- fields: {name: Philippa}
+  model: popolo.person
+  pk: 4
 - fields: {name: 'Fake Parliament', classification: 'legislature'}
   model: popolo.organization
   pk: 1
@@ -194,6 +204,27 @@
     scheme: popolo:person
   model: popolo.identifier
   pk: 9
+- fields:
+    content_type: [popolo, person]
+    identifier: 52xc7ardasd34569
+    object_id: 4
+    scheme: popit_id
+  model: popolo.identifier
+  pk: 10
+- fields:
+    content_type: [popolo, person]
+    identifier: http://popit.mysociety.org/api/v1/persons/4
+    object_id: 4
+    scheme: popit_url
+  model: popolo.identifier
+  pk: 11
+- fields:
+    content_type: [popolo, person]
+    identifier: 52xc7ardasd34569
+    object_id: 4
+    scheme: popolo:person
+  model: popolo.identifier
+  pk: 12
 - fields: {content: Public Answer,message: 2,person: 1}
   model: nuntium.answer
   pk: 1

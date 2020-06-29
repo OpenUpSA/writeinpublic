@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from django.core.management import call_command
-from instance.models import WriteItInstance
 from tastypie.test import ResourceTestCase, TestApiClient
 from django.contrib.auth.models import User
 from django.db.models import Count
@@ -13,9 +12,6 @@ class PersonResourceTestCase(ResourceTestCase):
         super(PersonResourceTestCase, self).setUp()
         call_command("loaddata", "example_data", verbosity=0)
         self.user = User.objects.get(id=1)
-        self.writeitinstance = WriteItInstance.objects.create(
-            name=u"a test", slug=u"a-test", owner=self.user
-        )
         self.api_client = TestApiClient()
 
         self.data = {
@@ -77,7 +73,7 @@ class PersonResourceTestCase(ResourceTestCase):
         self.assertValidJSONResponse(response)
 
         persons = self.deserialize(response)["objects"]
-        self.assertEqual(len(persons), Person.objects.has_contacts().count())
+        self.assertEqual(len(persons), 3)
 
     def test_filter_list_of_persons_by_does_not_have_contacts(self):
         url = "/api/v1/person/?has_contacts=False"
@@ -86,7 +82,7 @@ class PersonResourceTestCase(ResourceTestCase):
         self.assertValidJSONResponse(response)
 
         persons = self.deserialize(response)["objects"]
-        self.assertEqual(len(persons), Person.objects.doesnt_have_contacts().count())
+        self.assertEqual(len(persons), 1)
 
     def test_filter_invalid_has_contacts_value(self):
         url = "/api/v1/person/?has_contacts=something-else"
@@ -95,10 +91,10 @@ class PersonResourceTestCase(ResourceTestCase):
         self.assertHttpBadRequest(response)
 
     def test_filter_list_of_persons_by_instance(self):
-        url = "/api/v1/person/?instance_id=%d" % self.writeitinstance.id
+        url = "/api/v1/person/?instance_id=%d" % 1
         response = self.api_client.get(url, authentication=self.get_credentials())
 
         self.assertValidJSONResponse(response)
 
         persons = self.deserialize(response)["objects"]
-        self.assertEqual(len(persons), self.writeitinstance.persons.count())
+        self.assertEqual(len(persons), 1)
