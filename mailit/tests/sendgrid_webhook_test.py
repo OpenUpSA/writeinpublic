@@ -5,6 +5,7 @@ from django.test.utils import override_settings
 from django.test import Client
 from mailit.models import RawIncomingEmail
 from mailit.exceptions import TemporaryFailure
+from nuntium.models import OutboundMessageIdentifier
 
 
 def read_file(file_name):
@@ -87,3 +88,19 @@ class IncomingMailTestCase(TestCase):
         data = {'email': read_file('mailit/tests/fixture/temporary.txt')}
         with self.assertRaises(TemporaryFailure):
             Client().post('/mailit/inbound/sendgrid/raw/', data=data)
+
+    @override_settings(ADMINS=(('Felipe', 'falvarez@admins.org'),))
+    def test_mail_admins_if_outbound_message_identifier_error(self):
+        # Make sure there are no OutboundMessageIdentifiers with this key
+        key = '4aaaabbb'
+        OutboundMessageIdentifier.objects.filter(key=key).all().delete()
+
+        # Should not raise error
+        data = {'email': read_file('mailit/tests/fixture/mail_from_tony.txt')}
+        response = Client().post('/mailit/inbound/sendgrid/raw/', data=data)
+        self.assertEqual(response.status_code, 200)
+
+        # Should mail admins
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].to[0], 'falvarez@admins.org')
+        self.assertEquals(len(mail.outbox[0].attachments), 1)
