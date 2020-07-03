@@ -6,6 +6,7 @@ from django.test import Client
 from mailit.models import RawIncomingEmail
 from mailit.exceptions import TemporaryFailure
 from nuntium.models import OutboundMessageIdentifier
+from mock import patch
 
 
 def read_file(file_name):
@@ -89,8 +90,9 @@ class IncomingMailTestCase(TestCase):
         with self.assertRaises(TemporaryFailure):
             Client().post('/mailit/inbound/sendgrid/raw/', data=data)
 
+    @patch('mailit.views.logger')
     @override_settings(ADMINS=(('Felipe', 'falvarez@admins.org'),))
-    def test_mail_admins_if_outbound_message_identifier_error(self):
+    def test_mail_admins_if_outbound_message_identifier_error(self, logger_patch):
         # Make sure there are no OutboundMessageIdentifiers with this key
         key = '4aaaabbb'
         OutboundMessageIdentifier.objects.filter(key=key).all().delete()
@@ -104,3 +106,7 @@ class IncomingMailTestCase(TestCase):
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].to[0], 'falvarez@admins.org')
         self.assertEquals(len(mail.outbox[0].attachments), 1)
+
+        # Should log the error
+        args = logger_patch.error.call_args[0][0]
+        self.assertEquals('OutboundMessageIdentifier matching query does not exist.', str(args))
