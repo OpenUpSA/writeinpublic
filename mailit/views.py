@@ -46,9 +46,8 @@ class MailitTemplateUpdateView(UpdateView):
         return reverse('writeitinstance_template_update', subdomain=self.writeitinstance.slug)
 
 
-def send_error_email(email):
-    tb = traceback.format_exc()
-    text_content = "Error the traceback was:\n" + tb
+def send_error_email(email, traceback):
+    text_content = "Error the traceback was:\n" + traceback
     #mail_admins('Error handling incoming email', html_message, html_message=html_message)
     subject = "Error handling incoming email"
     mail = EmailMultiAlternatives('%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
@@ -79,9 +78,11 @@ class IncomingMail(View):
             logger.warn(e)
         except OutboundMessageIdentifier.DoesNotExist as e:
             logger.error(e)
-            send_error_email(email)
+            tb = traceback.format_exc()
+            send_error_email(email, tb)
         except Exception as e:
-            send_error_email(email)
+            tb = traceback.format_exc()
+            send_error_email(email, tb)
             raise e
 
         return HttpResponse()
