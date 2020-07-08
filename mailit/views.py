@@ -14,6 +14,7 @@ from instance.models import WriteItInstance
 from mailit.answer import OutboundMessageAnswer
 from mailit.bin.handleemail import EmailHandler
 from mailit.exceptions import CouldNotFindIdentifier
+from nuntium.models import OutboundMessageIdentifier
 from subdomains.utils import reverse
 import traceback
 
@@ -45,6 +46,18 @@ class MailitTemplateUpdateView(UpdateView):
         return reverse('writeitinstance_template_update', subdomain=self.writeitinstance.slug)
 
 
+def send_error_email(email, traceback):
+    text_content = "Error the traceback was:\n" + traceback
+    #mail_admins('Error handling incoming email', html_message, html_message=html_message)
+    subject = "Error handling incoming email"
+    mail = EmailMultiAlternatives('%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
+        text_content,  # content
+        settings.DEFAULT_FROM_EMAIL,  # From
+        [a[1] for a in settings.ADMINS],  # To
+        )
+    mail.attach('mail.txt', email, 'text/plain')
+    mail.send()
+
 class IncomingMail(View):
     """
     https://sendgrid.com/docs/API_Reference/Parse_Webhook/inbound_email.html
@@ -63,18 +76,13 @@ class IncomingMail(View):
             answer.send_back()
         except CouldNotFindIdentifier as e:
             logger.warn(e)
+        except OutboundMessageIdentifier.DoesNotExist as e:
+            logger.error(e)
+            tb = traceback.format_exc()
+            send_error_email(email, tb)
         except Exception as e:
             tb = traceback.format_exc()
-            text_content = "Error the traceback was:\n" + tb
-            #mail_admins('Error handling incoming email', html_message, html_message=html_message)
-            subject = "Error handling incoming email"
-            mail = EmailMultiAlternatives('%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
-                text_content,  # content
-                settings.DEFAULT_FROM_EMAIL,  # From
-                [a[1] for a in settings.ADMINS],  # To
-                )
-            mail.attach('mail.txt', email, 'text/plain')
-            mail.send()
+            send_error_email(email, tb)
             raise e
 
         return HttpResponse()
