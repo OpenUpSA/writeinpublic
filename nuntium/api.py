@@ -2,8 +2,9 @@
 
 import json
 
-from tastypie.resources import ModelResource, ALL_WITH_RELATIONS, Resource
+from tastypie.resources import ModelResource, ALL_WITH_RELATIONS, ALL, Resource
 from instance.models import PopoloPerson, WriteItInstance
+from popolo.models import Identifier
 from .models import Message, Answer, \
     OutboundMessageIdentifier, OutboundMessage, Confirmation
 from tastypie.authentication import ApiKeyAuthentication
@@ -11,7 +12,7 @@ from tastypie.authorization import Authorization
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf.urls import url
 from tastypie import fields
-from tastypie.exceptions import ImmediateHttpResponse
+from tastypie.exceptions import ImmediateHttpResponse, InvalidFilterError
 from tastypie import http
 from contactos.models import Contact
 from tastypie.paginator import Paginator
@@ -34,11 +35,46 @@ class PagePaginator(Paginator):
         return offset
 
 
+class IdentifierResource(ModelResource):
+    class Meta:
+        queryset = Identifier.objects.all()
+        resource_name = 'identifier'
+        filtering = {
+            'identifier': ALL,
+            'scheme': ALL,
+        }
+        allowed_methods = []
+
 class PersonResource(ModelResource):
+    identifiers = fields.ToManyField(IdentifierResource, 'identifiers', full=True)
+
     class Meta:
         queryset = PopoloPerson.objects.all()
         resource_name = 'person'
         authentication = ApiKeyAuthentication()
+        filtering = {
+            'identifiers': ALL_WITH_RELATIONS,
+        }
+
+    def obj_get_list(self, bundle, **kwargs):
+        result = super(PersonResource, self).obj_get_list(bundle, **kwargs)
+
+        filters = bundle.request.GET.copy()
+        if 'has_contacts' in filters:
+            # Count the number of contacts the person has
+            filters['has_contacts'] = filters['has_contacts'].lower()
+            if filters['has_contacts'] == 'true':
+                result = result.has_contacts()
+            elif filters['has_contacts'] == 'false':
+                result = result.doesnt_have_contacts()
+            else:
+                raise InvalidFilterError("'has_contacts' field must either be 'true' or 'false'.")
+
+        if 'instance_id' in filters:
+            result = result.filter(writeit_instances__id=filters['instance_id'])
+
+        return result
+
 
     def dehydrate(self, bundle):
         bundle.data['resource_uri'] = bundle.obj.uri_for_api()

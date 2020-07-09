@@ -41,7 +41,7 @@ class ListContactsTemplateTag(TestCase):
             "people": people
             })
         rendered = t.render(c)
-        self.assertEquals(u'Pedro, Marcel and Felipe', rendered)
+        self.assertEquals(u'Pedro, Marcel, Felipe and Philippa', rendered)
 
     def test_join_with_commas_another_language(self):
         '''
@@ -53,7 +53,7 @@ class ListContactsTemplateTag(TestCase):
             "people": people
             })
         rendered = t.render(c)
-        self.assertEquals(u'Pedro, Marcel, Felipe', rendered)
+        self.assertEquals(u'Pedro, Marcel, Felipe, Philippa', rendered)
 
     def test_join_with_commas_english(self):
         '''
@@ -65,7 +65,7 @@ class ListContactsTemplateTag(TestCase):
             "people": people
             })
         rendered = t.render(c)
-        self.assertEquals(u'Pedro, Marcel and Felipe', rendered)
+        self.assertEquals(u'Pedro, Marcel, Felipe and Philippa', rendered)
 
     def test_get_url_using_subdomain(self):
         '''

@@ -198,7 +198,7 @@ LOCAL_ELASTICSEARCH = False
 Running tests
 --------------
 
-For testing you need to run ```./manage.py test nuntium contactos mailit```
+For testing you need to run ```./manage.py test nuntium contactos mailit instance```
 
 Coverage Analysis
 -----------------
@@ -284,4 +284,4 @@ The github repos and the status of the development are listed below:
 
 There are instructions to install write-it in heroku
 ----------------------------------------------------
-The instructions are in [the following link](deploying_to_heroku.md).
+The instructions are in [the following link](deploying_to_heroku.md). 
