@@ -467,4 +467,12 @@ except:
     LOGIN_URL = '/accounts/login/'
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
+
+def show_toolbar(request):
+    return os.environ.get("DJANGO_DEBUG_TOOLBAR", "false").lower() == "true"
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': show_toolbar,
+}
+
 INTERNAL_IPS = ['127.0.0.1', '::1']

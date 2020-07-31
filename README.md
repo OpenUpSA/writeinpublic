@@ -86,6 +86,8 @@ Then run the development server with:
 
 And visit http://127.0.0.1.xip.io:8000 on your host machine to use WriteIt.
 
+You can enable the [debug-toolbar](https://django-debug-toolbar.readthedocs.io/en/latest/) by setting `DJANGO_DEBUG_TOOLBAR=true`
+
 
 ### Background jobs
 
