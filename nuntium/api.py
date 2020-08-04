@@ -209,10 +209,6 @@ class MessageResource(ModelResource):
     answers = fields.ToManyField(AnswerResource, 'answers',
                                  null=True,
                                  full=True)
-    people = fields.ToManyField(PersonResource, 'people',
-                                null=True,
-                                readonly=True,
-                                full=True)
 
     class Meta:
         queryset = Message.public_objects.select_related('writeitinstance')\
@@ -295,7 +291,6 @@ class MessageResource(ModelResource):
         if 'author_email' in bundle.data:
             bundle.data.pop('author_email', None)
         for person in bundle.obj.people:
-            print('\nfor person\n')
             bundle.data['persons'].append(person.uri_for_api())
         return bundle
 
