@@ -217,7 +217,7 @@ class MessageResource(ModelResource):
     class Meta:
         # queryset = Message.public_objects.all().order_by('-created')
         queryset = Message.public_objects.select_related('writeitinstance')\
-            .prefetch_related('answers')\
+            .prefetch_related('answers__person__identifiers')\
             .prefetch_related(
                 Prefetch(
                     'outboundmessage_set',
