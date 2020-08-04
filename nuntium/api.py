@@ -217,20 +217,6 @@ class MessageResource(ModelResource):
     class Meta:
         queryset = Message.public_objects.select_related('writeitinstance')\
             .prefetch_related('answers__person__identifiers')\
-            .prefetch_related(
-                Prefetch(
-                    'outboundmessage_set',
-                    queryset=OutboundMessage.objects.select_related('contact__person')\
-                        .all()
-                )) \
-            .prefetch_related('outboundmessage_set__contact__person__identifiers')\
-            .prefetch_related(
-                Prefetch(
-                    'nocontactom_set', 
-                    queryset=NoContactOM.objects.select_related('person').all()
-                )
-            ) \
-            .prefetch_related('nocontactom_set__person__identifiers')\
             .all().order_by('-created')
         # About the ordering
         # ordering = ['-created']

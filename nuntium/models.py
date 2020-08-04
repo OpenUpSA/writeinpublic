@@ -168,31 +168,12 @@ class Message(models.Model):
 
     @property
     def people(self):
-        people_with_contacts = [m.contact.person for m in self.outboundmessage_set.all()]
-        people_without_contacts = [m.person for m in self.nocontactom_set.all()]
-        # people_without_contacts = []
-        people = people_without_contacts + people_with_contacts
-        for p in people:
-            p.__class__ = PopoloPerson
-        # people = self.
-        # people = PopoloPerson.objects.filter(
-        #     Q(contact__outboundmessage__message=self) |
-        #     Q(nocontactom__message=self)
-        #     ).\
-        #     prefetch_related('identifiers').\
-        #     distinct()
-
-        return people
-
-    @property
-    def people2(self):
         people = PopoloPerson.objects.filter(
             Q(contact__outboundmessage__message=self) |
             Q(nocontactom__message=self)
-            ).\
-            prefetch_related('identifiers').\
-            distinct()
-
+        )\
+        .prefetch_related('identifiers')\
+        .distinct()
         return people
 
     @property
