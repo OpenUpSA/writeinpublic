@@ -22,7 +22,7 @@ class MessageResourceTestCase(ResourceTestCase):
 
     def test_get_list_of_messages(self):
         url = '/api/v1/message/'
-        with self.assertNumQueries(15):
+        with self.assertNumQueries(11):
             response = self.api_client.get(url, data=self.data)
 
         self.assertValidJSONResponse(response)
