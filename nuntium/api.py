@@ -6,7 +6,7 @@ from tastypie.resources import ModelResource, ALL_WITH_RELATIONS, ALL, Resource
 from instance.models import PopoloPerson, WriteItInstance
 from popolo.models import Identifier
 from .models import Message, Answer, \
-    OutboundMessageIdentifier, OutboundMessage, Confirmation
+    OutboundMessageIdentifier, OutboundMessage, Confirmation, NoContactOM
 from tastypie.authentication import ApiKeyAuthentication
 from tastypie.authorization import Authorization
 from django.core.exceptions import ObjectDoesNotExist
@@ -15,6 +15,7 @@ from tastypie import fields
 from tastypie.exceptions import ImmediateHttpResponse, InvalidFilterError
 from tastypie import http
 from contactos.models import Contact
+from django.db.models import Prefetch
 from tastypie.paginator import Paginator
 from django.http import Http404, HttpResponseBadRequest
 from django.core.exceptions import ValidationError
@@ -49,12 +50,16 @@ class PersonResource(ModelResource):
     identifiers = fields.ToManyField(IdentifierResource, 'identifiers', full=True)
 
     class Meta:
-        queryset = PopoloPerson.objects.all()
+        queryset = PopoloPerson.objects.all().prefetch_related('identifiers')
         resource_name = 'person'
         authentication = ApiKeyAuthentication()
         filtering = {
             'identifiers': ALL_WITH_RELATIONS,
         }
+
+    # def get_object_list(self, request):
+    #     queryset = super(PersonResource, self).get_object_list()
+    #     return queryset.prefetch_related('identifiers')
 
     def obj_get_list(self, bundle, **kwargs):
         result = super(PersonResource, self).obj_get_list(bundle, **kwargs)
@@ -157,7 +162,7 @@ class AnswerResource(ModelResource):
         )
 
     class Meta:
-        queryset = Answer.objects.all().order_by('-created')
+        queryset = Answer.objects.all().select_related('person').order_by('-created')
         resource_name = 'answer'
 
     def get_list(self, request, **kwargs):
@@ -210,7 +215,25 @@ class MessageResource(ModelResource):
                                 full=True)
 
     class Meta:
-        queryset = Message.public_objects.all().order_by('-created')
+        # queryset = Message.public_objects.all().order_by('-created')
+        queryset = Message.public_objects.select_related('writeitinstance')\
+            .prefetch_related('answers')\
+            .prefetch_related(
+                Prefetch(
+                    'outboundmessage_set',
+                    queryset=OutboundMessage.objects.select_related('contact__person')\
+                        .prefetch_related('contact__person__identifiers').all()
+                )) \
+            .prefetch_related('outboundmessage_set__contact__person__identifiers')\
+            .prefetch_related(
+                Prefetch(
+                    'nocontactom_set', 
+                    queryset=NoContactOM.objects.select_related('person').\
+                        prefetch_related('person__identifiers').all()
+                )
+            ) \
+            .prefetch_related('nocontactom_set__person__identifiers')\
+            .all().order_by('-created')
         # About the ordering
         # ordering = ['-created']
         # should work but it doesn't so I put it in the queryset
@@ -288,6 +311,7 @@ class MessageResource(ModelResource):
         if 'author_email' in bundle.data:
             bundle.data.pop('author_email', None)
         for person in bundle.obj.people:
+            print('\nfor person\n')
             bundle.data['persons'].append(person.uri_for_api())
         return bundle
 
