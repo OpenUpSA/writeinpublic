@@ -57,10 +57,6 @@ class PersonResource(ModelResource):
             'identifiers': ALL_WITH_RELATIONS,
         }
 
-    # def get_object_list(self, request):
-    #     queryset = super(PersonResource, self).get_object_list()
-    #     return queryset.prefetch_related('identifiers')
-
     def obj_get_list(self, bundle, **kwargs):
         result = super(PersonResource, self).obj_get_list(bundle, **kwargs)
 
