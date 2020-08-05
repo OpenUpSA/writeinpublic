@@ -167,8 +167,8 @@ class EmailHandler(FroideEmailParser):
 
         the_recipient = re.sub(r"\n", "", the_recipient)
 
-        regex = re.compile(r".*[\+\-](.*)@.*")
-        the_match = regex.match(the_recipient)
+        regex = re.compile(r"\w+[\+\-](\w+?)@")
+        the_match = regex.search(the_recipient)
         if the_match is None:
             raise CouldNotFindIdentifier
         answer.email_to = the_recipient
