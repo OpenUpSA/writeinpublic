@@ -77,7 +77,7 @@ class IncomingMail(View):
         except CouldNotFindIdentifier as e:
             logger.warn(e)
         except OutboundMessageIdentifier.DoesNotExist as e:
-            logger.error(e)
+            logger.exception(e)
             tb = traceback.format_exc()
             send_error_email(email, tb)
         except Exception as e:
