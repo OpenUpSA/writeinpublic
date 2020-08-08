@@ -132,6 +132,29 @@ class EmailAnswer(EmailSaveMixin, EmailReportBounceMixin):
     def add_attachment(self, attachment):
         self.attachments.append(attachment)
 
+def get_outbound_message_identifier(the_recipient):
+    """
+    Get the OutboundMessageIdentifier key from the recipients/"To" value of 
+    an incoming email.
+
+    It tries to find the first email that contains a "+" and returns the part
+    after the "+" and before the "@". For example, for 'admin+12345@pa.org.za"
+    it will return "12345".
+
+    :param the_recipient: String value containing the recipient(s) of the email
+        separated by commas. For example:
+        "Zene Van niekerk <south-africa-assembly+25459cface3411eaa5e00242ac110006@writeinpublic.pa.org.za>, 
+        Nomsa Tarabella-Marchesi <nomsa_marchesi@hotmail.com>"
+    
+    :raises CouldNotFindIdentifier: if it can't find an identifier in the
+        recipient value.
+    """
+    regex = re.compile(r"\w+[\+\-](\w+?)@")
+    the_match = regex.search(the_recipient)
+    if the_match is None:
+        raise CouldNotFindIdentifier
+    return the_match.groups()[0]
+
 
 class EmailHandler(FroideEmailParser):
     def __init__(self, answer_class=EmailAnswer):
@@ -144,7 +167,7 @@ class EmailHandler(FroideEmailParser):
 
     def save_raw_email(self, lines):
         return RawIncomingEmail.objects.create(content=lines)
-
+    
     def instanciate_answer(self, lines):
         answer = self.answer_class()
         msgtxt = ''.join(lines)
@@ -167,12 +190,8 @@ class EmailHandler(FroideEmailParser):
 
         the_recipient = re.sub(r"\n", "", the_recipient)
 
-        regex = re.compile(r"\w+[\+\-](\w+?)@")
-        the_match = regex.search(the_recipient)
-        if the_match is None:
-            raise CouldNotFindIdentifier
+        answer.outbound_message_identifier = get_outbound_message_identifier(the_recipient)
         answer.email_to = the_recipient
-        answer.outbound_message_identifier = the_match.groups()[0]
         logging.info("Reading the parts")
         for part in msg.walk():
             logging.info("Part of type " + part.get_content_type())

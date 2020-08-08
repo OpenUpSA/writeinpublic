@@ -14,7 +14,10 @@ from global_test_case import GlobalTestCase as TestCase
 from global_test_case import ResourceGlobalTestCase as ResourceTestCase
 from mailit.answer import OutboundMessageAnswer
 from mailit.bin import config
-from mailit.bin.handleemail import EmailHandler, EmailAnswer, ApiKeyAuth
+from mailit.bin.handleemail import (
+    EmailHandler, EmailAnswer, ApiKeyAuth, get_outbound_message_identifier
+)
+from mailit.exceptions import CouldNotFindIdentifier
 from mailit.models import BouncedMessageRecord
 
 
@@ -95,6 +98,24 @@ class DoesNotIncludeTheIdentifierInTheContent(TestCase):
             self.answer.send_back()
 
             post.assert_called_with(self.where_to_post_creation_of_the_answer, data=data, headers=expected_headers)
+
+
+class GetOutboundMessageIdentifierTestCase(ResourceTestCase):
+    def test_get_identifier_from_one_email(self):
+        recipient = "test+12345@gmail.com"
+        result = get_outbound_message_identifier(recipient)
+        self.assertEquals(result, "12345")
+
+    def test_raise_exception_for_no_identifier_found(self):
+        recipient = "test@gmail.com"
+
+        with self.assertRaises(CouldNotFindIdentifier):
+            result = get_outbound_message_identifier(recipient)
+
+    def test_get_identifier_from_multiple_emails(self):
+        recipient = "Zene Van niekerk <south-africa-assembly+25459cface3411eaa5e00242ac110006@writeinpublic.pa.org.za>, Nomsa Tarabella-Marchesi <nomsa_marchesi@hotmail.com>"
+        result = get_outbound_message_identifier(recipient)
+        self.assertEquals(result, "25459cface3411eaa5e00242ac110006")
 
 
 class IncomingEmailHandlerTestCase(ResourceTestCase):
