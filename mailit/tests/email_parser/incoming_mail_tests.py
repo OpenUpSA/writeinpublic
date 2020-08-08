@@ -100,7 +100,7 @@ class DoesNotIncludeTheIdentifierInTheContent(TestCase):
             post.assert_called_with(self.where_to_post_creation_of_the_answer, data=data, headers=expected_headers)
 
 
-class GetOutboundMessageIdentifierTestCase(ResourceTestCase):
+class GetOutboundMessageIdentifierTestCase(TestCase):
     def test_get_identifier_from_one_email(self):
         recipient = "test+12345@gmail.com"
         result = get_outbound_message_identifier(recipient)
