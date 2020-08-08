@@ -167,7 +167,7 @@ class EmailHandler(FroideEmailParser):
 
     def save_raw_email(self, lines):
         return RawIncomingEmail.objects.create(content=lines)
-    
+
     def instanciate_answer(self, lines):
         answer = self.answer_class()
         msgtxt = ''.join(lines)
