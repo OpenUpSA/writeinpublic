@@ -108,5 +108,5 @@ class IncomingMailTestCase(TestCase):
         self.assertEquals(len(mail.outbox[0].attachments), 1)
 
         # Should log the error
-        args = logger_patch.error.call_args[0][0]
+        args = logger_patch.exception.call_args[0][0]
         self.assertEquals('OutboundMessageIdentifier matching query does not exist.', str(args))
