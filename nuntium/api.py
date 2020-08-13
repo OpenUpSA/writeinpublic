@@ -6,7 +6,7 @@ from tastypie.resources import ModelResource, ALL_WITH_RELATIONS, ALL, Resource
 from instance.models import PopoloPerson, WriteItInstance
 from popolo.models import Identifier
 from .models import Message, Answer, \
-    OutboundMessageIdentifier, OutboundMessage, Confirmation, NoContactOM
+    OutboundMessageIdentifier, OutboundMessage, Confirmation
 from tastypie.authentication import ApiKeyAuthentication
 from tastypie.authorization import Authorization
 from django.core.exceptions import ObjectDoesNotExist
@@ -15,7 +15,6 @@ from tastypie import fields
 from tastypie.exceptions import ImmediateHttpResponse, InvalidFilterError
 from tastypie import http
 from contactos.models import Contact
-from django.db.models import Prefetch
 from tastypie.paginator import Paginator
 from django.http import Http404, HttpResponseBadRequest
 from django.core.exceptions import ValidationError
