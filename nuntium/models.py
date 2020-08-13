@@ -171,8 +171,9 @@ class Message(models.Model):
         people = PopoloPerson.objects.filter(
             Q(contact__outboundmessage__message=self) |
             Q(nocontactom__message=self)
-            ).distinct()
-
+        )\
+        .prefetch_related('identifiers')\
+        .distinct()
         return people
 
     @property

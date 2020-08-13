@@ -49,7 +49,7 @@ class PersonResource(ModelResource):
     identifiers = fields.ToManyField(IdentifierResource, 'identifiers', full=True)
 
     class Meta:
-        queryset = PopoloPerson.objects.all()
+        queryset = PopoloPerson.objects.all().prefetch_related('identifiers')
         resource_name = 'person'
         authentication = ApiKeyAuthentication()
         filtering = {
@@ -157,7 +157,7 @@ class AnswerResource(ModelResource):
         )
 
     class Meta:
-        queryset = Answer.objects.all().order_by('-created')
+        queryset = Answer.objects.all().select_related('person').order_by('-created')
         resource_name = 'answer'
 
     def get_list(self, request, **kwargs):
@@ -204,13 +204,11 @@ class MessageResource(ModelResource):
     answers = fields.ToManyField(AnswerResource, 'answers',
                                  null=True,
                                  full=True)
-    people = fields.ToManyField(PersonResource, 'people',
-                                null=True,
-                                readonly=True,
-                                full=True)
 
     class Meta:
-        queryset = Message.public_objects.all().order_by('-created')
+        queryset = Message.public_objects.select_related('writeitinstance')\
+            .prefetch_related('answers__person__identifiers')\
+            .all().order_by('-created')
         # About the ordering
         # ordering = ['-created']
         # should work but it doesn't so I put it in the queryset

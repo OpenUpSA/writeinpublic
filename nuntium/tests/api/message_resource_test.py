@@ -22,7 +22,8 @@ class MessageResourceTestCase(ResourceTestCase):
 
     def test_get_list_of_messages(self):
         url = '/api/v1/message/'
-        response = self.api_client.get(url, data=self.data)
+        with self.assertNumQueries(11):
+            response = self.api_client.get(url, data=self.data)
 
         self.assertValidJSONResponse(response)
 
@@ -123,7 +124,7 @@ class MessageResourceTestCase(ResourceTestCase):
 
         self.assertTrue('answers' in messages[0])
 
-    def test_the_message_has_the_people_it_was_sent_to(self):
+    def test_the_message_has_the_persons_it_was_sent_to(self):
         url = '/api/v1/message/'
         response = self.api_client.get(url, data=self.data)
         self.assertValidJSONResponse(response)
@@ -132,14 +133,11 @@ class MessageResourceTestCase(ResourceTestCase):
         self.assertTrue('persons' in messages[0])
         message_from_the_api = messages[0]
         message = Message.objects.get(id=messages[0]['id'])
-        for person in message_from_the_api['people']:
-            self.assertIn('popit_url', person)
-
+        for person_uri in message_from_the_api['persons']:
             self.assertIn(
-                PopoloPerson.objects.get(id=person['id']),
+                PopoloPerson.objects.get(identifiers__identifier=person_uri),
                 message.people.all(),
-                )
-        self.assertEquals(len(message_from_the_api['people']), message.people.count())
+            )
 
     def test_create_a_new_message(self):
         writeitinstance = WriteItInstance.objects.get(id=1)
@@ -347,5 +345,3 @@ class MessageResourceTestCase(ResourceTestCase):
         self.assertEqual(len(messages_from_api), 1)
         message_from_api = messages_from_api[0]
         self.assertEqual(message_from_api['id'], expected_message.id)
-        self.assertEqual(len(message_from_api['people']), 1)
-        self.assertEqual(message_from_api['people'][0]['id'], person.id)
