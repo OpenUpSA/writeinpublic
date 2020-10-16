@@ -168,7 +168,7 @@ class NewAnswerNotificationToSubscribers(TestCase):
 
         self.assertEquals(
             mail.outbox[0].from_email,
-            self.instance.slug + "@" + settings.DEFAULT_FROM_DOMAIN,
+            settings.DEFAULT_NO_REPLY_EMAIL,
             )
 
     def test_when_an_answer_is_created_then_a_mail_is_sent_to_the_subscribers_with_real_name(self):
@@ -179,7 +179,7 @@ class NewAnswerNotificationToSubscribers(TestCase):
 
         self.assertEquals(len(mail.outbox), 1)
         email_to_check = mail.outbox[0]
-        expected_email_address = self.message.writeitinstance.slug + "@" + settings.DEFAULT_FROM_DOMAIN
+        expected_email_address = settings.DEFAULT_NO_REPLY_EMAIL
         expected_real_name = u'☃ The Snowman ☃'
         expected_from = u'{real_name} <{email}>'.format(
             real_name=expected_real_name,
@@ -230,9 +230,9 @@ class NewAnswerNotificationToSubscribers(TestCase):
 
     @override_settings(SEND_ALL_EMAILS_FROM_DEFAULT_FROM_EMAIL=True)
     def test_send_subscribers_notice_from_a_single_unified_email(self):
-        '''Send emails from default from email'''
+        '''Send emails from default no-reply email'''
         self.create_a_new_answer()
-        self.assertEquals(mail.outbox[0].from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEquals(mail.outbox[0].from_email, settings.DEFAULT_NO_REPLY_EMAIL)
 
     def test_owner_of_the_instance_is_notified_when_a_new_answer_comes_in(self):
         self.instance.config.notify_owner_when_new_answer = True
@@ -245,8 +245,10 @@ class NewAnswerNotificationToSubscribers(TestCase):
         self.assertEquals(len(mail.outbox[1].to), 1)
         self.assertEquals(mail.outbox[1].to[0], user.email)
 
-    def test_notify_the_owner_using_custom_domain(self):
-        '''Using custom domain to notify the owner of an instance if custom config is provided'''
+    def test_notify_the_owner_using_no_reply_even_ifcustom_domain(self):
+        '''
+        Still use default no-reply email to notify the owner of an instance 
+        even if custom config is provided'''
         config = self.instance.config
         config.custom_from_domain = "custom.domain.cl"
         config.email_host = 'cuttlefish.au.org'
@@ -262,7 +264,7 @@ class NewAnswerNotificationToSubscribers(TestCase):
         sent_mail = mail.outbox[1]
         self.assertEquals(
             sent_mail.from_email,
-            self.instance.slug + "@" + config.custom_from_domain,
+            settings.DEFAULT_NO_REPLY_EMAIL,
             )
         connection = sent_mail.connection
         self.assertEquals(connection.host, config.email_host)
@@ -273,8 +275,11 @@ class NewAnswerNotificationToSubscribers(TestCase):
 
         #I didn't have to change anything =/
 
-    def test_send_subscriber_mail_from_custom_domain(self):
-        '''The mail to the subscriber if new answer exists from a custom domain'''
+    def test_send_subscriber_mail_from_no_reply_even_if_custom_domain(self):
+        '''
+        The mail to the subscriber if new answer exists from the default 
+        no reply email even if the instance has a custom domain.
+        '''
         config = self.instance.config
         config.custom_from_domain = "custom.domain.cl"
         config.email_host = 'cuttlefish.au.org'
@@ -288,7 +293,7 @@ class NewAnswerNotificationToSubscribers(TestCase):
         sent_mail = mail.outbox[0]
         self.assertEquals(
             sent_mail.from_email,
-            self.instance.slug + "@" + config.custom_from_domain,
+            settings.DEFAULT_NO_REPLY_EMAIL,
             )
         connection = sent_mail.connection
         self.assertEquals(connection.host, config.email_host)
