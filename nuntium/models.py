@@ -339,7 +339,11 @@ def send_new_answer_payload(sender, instance, created, **kwargs):
         text_content = new_answer_template.get_content_template().format(**context)
         html_content = new_answer_template.template_html.format(**escape_dictionary_values(context))
 
-        if settings.SEND_ALL_EMAILS_FROM_DEFAULT_FROM_EMAIL:
+        if settings.DEFAULT_NO_REPLY_EMAIL:
+            # We prefer to send answer notifications from the no-reply email
+            # address so that it's clear to users that they can't reply to it.
+            from_email = settings.DEFAULT_NO_REPLY_EMAIL
+        elif settings.SEND_ALL_EMAILS_FROM_DEFAULT_FROM_EMAIL:
             from_email = settings.DEFAULT_FROM_EMAIL
         else:
             from_domain = writeitinstance.config.custom_from_domain or settings.DEFAULT_FROM_DOMAIN
