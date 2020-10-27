@@ -336,11 +336,14 @@ TEST_POPIT_API_URL = "http://%s.%s.xip.io:%s/api/v0.1/export.json" % (
     TEST_POPIT_API_PORT,
     )
 
+
 # Email settings
-DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", 'mailer@example.com')
+DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", 'south-africa-assembly@writeinpublic.pa.org.za')
+
+DEFAULT_NO_REPLY_LOCAL_PART = env.str('DEFAULT_NO_REPLY_LOCAL_PART', 'no-reply')
 
 # DEFAULT_FROM_DOMAIN
-DEFAULT_FROM_DOMAIN = env.str("DEFAULT_FROM_DOMAIN", 'mailit.ciudadanointeligente.org')
+DEFAULT_FROM_DOMAIN = env.str("DEFAULT_FROM_DOMAIN", 'writeinpublic.pa.org.za')
 
 # In some cases it is needed that all emails come from one single
 # email address, such is the case when you have just verified a single sender

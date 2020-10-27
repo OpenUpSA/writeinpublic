@@ -168,7 +168,7 @@ class NewAnswerNotificationToSubscribers(TestCase):
 
         self.assertEquals(
             mail.outbox[0].from_email,
-            self.instance.slug + "@" + settings.DEFAULT_FROM_DOMAIN,
+            settings.DEFAULT_NO_REPLY_LOCAL_PART + "@" + settings.DEFAULT_FROM_DOMAIN,
             )
 
     def test_when_an_answer_is_created_then_a_mail_is_sent_to_the_subscribers_with_real_name(self):
@@ -179,7 +179,7 @@ class NewAnswerNotificationToSubscribers(TestCase):
 
         self.assertEquals(len(mail.outbox), 1)
         email_to_check = mail.outbox[0]
-        expected_email_address = self.message.writeitinstance.slug + "@" + settings.DEFAULT_FROM_DOMAIN
+        expected_email_address = settings.DEFAULT_NO_REPLY_LOCAL_PART + "@" + settings.DEFAULT_FROM_DOMAIN
         expected_real_name = u'☃ The Snowman ☃'
         expected_from = u'{real_name} <{email}>'.format(
             real_name=expected_real_name,
@@ -262,7 +262,7 @@ class NewAnswerNotificationToSubscribers(TestCase):
         sent_mail = mail.outbox[1]
         self.assertEquals(
             sent_mail.from_email,
-            self.instance.slug + "@" + config.custom_from_domain,
+            settings.DEFAULT_NO_REPLY_LOCAL_PART + "@" + config.custom_from_domain,
             )
         connection = sent_mail.connection
         self.assertEquals(connection.host, config.email_host)
@@ -288,7 +288,7 @@ class NewAnswerNotificationToSubscribers(TestCase):
         sent_mail = mail.outbox[0]
         self.assertEquals(
             sent_mail.from_email,
-            self.instance.slug + "@" + config.custom_from_domain,
+            settings.DEFAULT_NO_REPLY_LOCAL_PART + "@" + config.custom_from_domain,
             )
         connection = sent_mail.connection
         self.assertEquals(connection.host, config.email_host)

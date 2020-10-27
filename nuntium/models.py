@@ -344,7 +344,7 @@ def send_new_answer_payload(sender, instance, created, **kwargs):
         else:
             from_domain = writeitinstance.config.custom_from_domain or settings.DEFAULT_FROM_DOMAIN
             from_email = "%s@%s" % (
-                writeitinstance.slug,
+                settings.DEFAULT_NO_REPLY_LOCAL_PART,
                 from_domain,
                 )
 
