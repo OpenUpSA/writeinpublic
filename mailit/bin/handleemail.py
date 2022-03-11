@@ -13,6 +13,7 @@ from mailit.models import RawIncomingEmail
 from nuntium.models import Answer
 from mailit.bin.froide_email_utils import FroideEmailParser
 from mailit.exceptions import CouldNotFindIdentifier, TemporaryFailure
+from django.conf import settings
 
 logging.basicConfig(filename='mailing_logger.txt', level=logging.INFO)
 
@@ -115,7 +116,8 @@ class EmailAnswer(EmailSaveMixin, EmailReportBounceMixin):
 
     def send_back(self):
         if self.is_bounced:
-            self.report_bounce()
+            if settings.FLAG_BOUNCED_CONTACTS:
+                self.report_bounce()
         else:
             answer = self.save()
             raw_answers = RawIncomingEmail.objects.filter(message_id=self.message_id)
