@@ -433,7 +433,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-# SESSION_COOKIE_DOMAIN = env.str("SESSION_COOKIE_DOMAIN", "localhost")
+SESSION_COOKIE_DOMAIN = env.str("SESSION_COOKIE_DOMAIN", "localhost")
 
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_ENABLE_UTC = True
