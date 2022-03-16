@@ -413,6 +413,10 @@ OVERALL_MAX_RECIPIENTS = 10
 # Logs every incoming email??
 INCOMING_EMAIL_LOGGING = 'None'
 
+# Should WriteInPublic handle bounces?
+FLAG_BOUNCED_CONTACTS = False
+
+
 # setting to avoid db changes during test
 
 EXTRA_APPS = ()

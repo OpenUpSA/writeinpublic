@@ -3,7 +3,6 @@ from mailit.models import BouncedMessageRecord
 from nuntium.models import OutboundMessageIdentifier, OutboundMessage, OutboundMessagePluginRecord, AnswerAttachment
 from django.core.files import File
 
-
 class OutboundMessageAnswer(EmailAnswer):
     def save(self):
         answer = OutboundMessageIdentifier.create_answer(self.outbound_message_identifier, self.content_text)
