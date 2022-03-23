@@ -179,6 +179,24 @@ class ContactTestCase(TestCase):
         self.assertEquals(mail.outbox[0].subject, _('The contact contact point for Pedro has bounced'))
         self.assertEquals(mail.outbox[0].from_email, settings.DEFAULT_FROM_EMAIL)
 
+    def test_when_a_contact_is_NOT_set_to_bounced_it_DOES_NOT_send_a_mail_to_its_owner(self):
+        # This test assumes FLAG_BOUNCED_CONTACTS = False
+        # See test mailit.tests.email_parser.incoming_mail_tests:FlaggingBouncedMail
+        writeitinstance = WriteItInstance.objects.get(id=1)
+        contact_type = ContactType.objects.create(
+            name='mental message',
+            label_name='mental address id',
+            )
+        contact1 = Contact.objects.create(
+            contact_type=contact_type,
+            value='contact point',
+            person=self.person,
+            writeitinstance=writeitinstance,
+            )
+
+        contact1.save()
+        self.assertEquals(len(mail.outbox), 0) 
+
     def test_sends_a_notification_mail_only_once(self):
         writeitinstance = WriteItInstance.objects.get(id=1)
         contact_type = ContactType.objects.create(
