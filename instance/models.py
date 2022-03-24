@@ -1,6 +1,8 @@
 from copy import copy
 import datetime
 
+import logging
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
@@ -24,6 +26,7 @@ from subdomains.utils import reverse
 
 from contactos.models import Contact
 from mailit import MailChannel
+logger = logging.getLogger(__name__)
 
 
 class PopoloPersonQuerySet(models.QuerySet):
@@ -312,10 +315,12 @@ class WriteItInstance(models.Model):
                     person=person).update(enabled=False)
         except ConnectionError, e:
             self.do_something_with_a_vanished_popit_api_instance(popolo_source)
+            logger.exception("We could not connect with the URL")
             e.message = _('We could not connect with the URL')
             return (False, e)
         except Exception, e:
             self.do_something_with_a_vanished_popit_api_instance(popolo_source)
+            logger.exception("Unexpected error relating persons with popolo JSON")
             return (False, e)
 
         return (True, None)
