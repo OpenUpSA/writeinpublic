@@ -30,6 +30,8 @@ urlpatterns = patterns('',
     url(r'^contactos/', include('contactos.urls')),
 
     url(r'^mailit/', include('mailit.urls')),
+
+    url(r'^', include('mailreporter.urls')),
 )
 
 urlpatterns += i18n_patterns('',
