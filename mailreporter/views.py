@@ -17,7 +17,7 @@ def mailReporter(request):
     # Possible Events:
     # processed, dropped, delivered, deferred, bounce, open, click, spam report, unsubscribe, group unsubscribe, and group resubscribe
 
-    events_catch = ['bounce', 'dropped', 'spam report']
+    events_catch = ['bounce']
 
     categories_catch = []
 
