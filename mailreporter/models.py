@@ -5,7 +5,7 @@ import jsonfield
  
 class Report(models.Model):
     report = jsonfield.JSONField()
-    processed = models.BooleanField(default=False)
+    resolved = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True, null=True)
 
     def email(self):

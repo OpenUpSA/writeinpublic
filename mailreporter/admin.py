@@ -10,12 +10,12 @@ from mailreporter.models import Report
 @admin.register(Report)
 class MailReporterAdmin(admin.ModelAdmin):
       search_fields = ['report']
-      list_display = ['email', 'event', 'type', 'reason', 'timestamp', 'processed', 'contact']
+      list_display = ['email', 'type', 'reason', 'timestamp', 'resolved', 'contact']
       list_display_links = ['reason']
-      list_filter = ['processed']
+      list_filter = ['resolved']
       fieldsets = [
         (None, {
-            'fields': ['report','processed'],
+            'fields': ['report','resolved'],
             'classes': ['wide']
         }
       )]
