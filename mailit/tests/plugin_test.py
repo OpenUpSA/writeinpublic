@@ -1,6 +1,7 @@
 from smtplib import SMTPServerDisconnected, SMTPResponseException
 from mock import patch
 import codecs
+import json
 
 from django.core import mail
 from subdomains.utils import reverse
@@ -136,7 +137,7 @@ class MailSendingTestCase(TestCase):
 
         self.assertEquals(len(message.to), 1)
         self.assertIn("pdaire@ciudadanointeligente.org", message.to)
-        self.assertEquals(json.loads(message.headers["X-SMTPAPI"])["category"], "writeinpublic")
+        self.assertEquals(json.loads(message.extra_headers["X-SMTPAPI"])["category"], "writeinpublic")
 
     def test_sending_email_links_for_default_language(self):
         # Change the default language of the instance, and check that the

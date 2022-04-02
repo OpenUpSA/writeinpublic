@@ -17,7 +17,7 @@ def mailReporter(request):
     # Possible Events:
     # processed, dropped, delivered, deferred, bounce, open, click, spam report, unsubscribe, group unsubscribe, and group resubscribe
 
-    events_catch = ['bounce']
+    events_catch = ['bounce', 'dropped']
 
     categories_catch = []
 
@@ -25,7 +25,7 @@ def mailReporter(request):
 
         if report['event'] in events_catch:
 
-            if 'category' not in report:
+            if 'category' in report and 'writeinpublic' in report["category"]:
 
                 new_report = Report(
                     report = report
@@ -33,4 +33,3 @@ def mailReporter(request):
                 new_report.save()
 
     return HttpResponse("Message received okay.", content_type="text/plain")
-

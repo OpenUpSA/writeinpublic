@@ -32,7 +32,7 @@ def prepare_headers():
     xsmtpapi_dict = {
         "category": "writeinpublic",
     }
-    xsmtpapi_str = json.dumps(wsmtpapi_dict)
+    xsmtpapi_str = json.dumps(xsmtpapi_dict)
     return {
         "X-SMTPAPI": xsmtpapi_str,
     }
