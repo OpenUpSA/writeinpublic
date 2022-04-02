@@ -1,0 +1,25 @@
+name: Test - Django CI
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 0 * * 0' # weekly
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run tests
+        run: docker-compose run --rm web bin/wait-for-deps.sh coverage run --source=nuntium,contactos,mailit,instance manage.py test nuntium contactos mailit instance
+
+      - run: docker-compose logs db elasticsearch
+        if: ${{ always() }}
+
+      # Run codecov passing appropriate codecov.io CI environment variables to container
+      - name: Upload coverage data to codecov.io
+        run: "docker-compose run --rm `bash <(curl -s https://codecov.io/env)` web codecov --file /var/coverage/.coverage"
+        if: ${{ always() }}

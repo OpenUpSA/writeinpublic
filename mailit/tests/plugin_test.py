@@ -136,6 +136,7 @@ class MailSendingTestCase(TestCase):
 
         self.assertEquals(len(message.to), 1)
         self.assertIn("pdaire@ciudadanointeligente.org", message.to)
+        self.assertEquals(json.loads(message.headers["X-SMTPAPI"])["category"], "writeinpublic")
 
     def test_sending_email_links_for_default_language(self):
         # Change the default language of the instance, and check that the
