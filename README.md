@@ -54,6 +54,11 @@ Configure the Inbound Parse webhook to POST to /mailit/inbound/sendgrid/raw/ on 
 
 Make sure to select RAW format.
 
+Handle message delivery logging web hooks
+-----------------------------------------
+
+Configure the sendgrid email event web hook to POST to `/mailreporter/`
+
 
 Local development using docker-compose
 ======================================
@@ -286,4 +291,4 @@ The github repos and the status of the development are listed below:
 
 There are instructions to install write-it in heroku
 ----------------------------------------------------
-The instructions are in [the following link](deploying_to_heroku.md). 
+The instructions are in [the following link](deploying_to_heroku.md).
