@@ -238,6 +238,7 @@ INSTALLED_APPS = (
     # Multi-page form wizard
     'formtools',
     'subdomains',
+    'mailreporter'
 )
 
 if TESTING:

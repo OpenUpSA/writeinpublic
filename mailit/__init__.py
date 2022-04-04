@@ -1,4 +1,5 @@
 import itertools
+import json
 import logging
 import textwrap
 
@@ -25,6 +26,16 @@ def process_content(content, indent='    ', width=66):
                        in itertools.chain(*[lines or [u""] for lines in [textwrap.wrap(x, width) for x in content.splitlines()]])]
                       )
 
+def prepare_headers():
+    # Hardcode sendgrid X-SMTPAPI header with a category to identify writinpublic
+    # mail for now.
+    xsmtpapi_dict = {
+        "category": "writeinpublic",
+    }
+    xsmtpapi_str = json.dumps(xsmtpapi_dict)
+    return {
+        "X-SMTPAPI": xsmtpapi_str,
+    }
 
 class MailChannel(OutputPlugin):
     name = 'mail-channel'
@@ -94,6 +105,7 @@ class MailChannel(OutputPlugin):
                 from_email,
                 [to_email],
                 connection=writeitinstance.config.get_mail_connection(),
+                headers=prepare_headers(),
                 )
             if html_content:
                 msg.attach_alternative(html_content, "text/html")
