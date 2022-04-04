@@ -9,6 +9,7 @@ from mailit.answer import OutboundMessageAnswer
 from mailit.models import RawIncomingEmail
 from mailit.bin.handleemail import EmailHandler
 from mailit.exceptions import TemporaryFailure
+from django.conf import settings
 
 
 class ManagementCommandAnswer(TestCase):
@@ -35,6 +36,7 @@ class ManagementCommandAnswer(TestCase):
 class ManagementCommandAnswerBehaviour(TestCase):
     def setUp(self):
         super(ManagementCommandAnswerBehaviour, self).setUp()
+        settings.FLAG_BOUNCED_CONTACTS = True
         self.outbound_message = OutboundMessage.objects.get(id=1)
         self.identifier = self.outbound_message.outboundmessageidentifier
         self.email_answer = OutboundMessageAnswer()
@@ -64,6 +66,7 @@ class ManagementCommandAnswerBehaviour(TestCase):
 
     def test_it_handles_bounces_in_send_back_function(self):
         #the email is a bounce
+
         self.email_answer.is_bounced = True
         self.email_answer.send_back()
 

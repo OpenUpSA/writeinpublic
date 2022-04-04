@@ -228,7 +228,7 @@ class ContactTestCase(TestCase):
 class ResendOutboundMessages(TestCase):
     def setUp(self):
         super(ResendOutboundMessages, self).setUp()
-
+        settings.FLAG_BOUNCED_CONTACTS = True
         self.contact = Contact.objects.get(value="mailnoexistente@ciudadanointeligente.org")
         self.contact.is_bounced = True
         self.contact.save()
@@ -256,7 +256,7 @@ class ResendOutboundMessages(TestCase):
 
     def test_resend_outbound_messages(self):
         self.contact.resend_messages()
-
+        
         outbound_messages = OutboundMessage.objects.filter(contact=self.contact)
         current_amount_of_mails_sent_after_resend_messages = len(mail.outbox)
         self.assertEquals(current_amount_of_mails_sent_after_resend_messages - self.previous_amount_of_mails, outbound_messages.count())
