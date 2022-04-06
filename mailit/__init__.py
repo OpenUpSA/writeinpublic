@@ -55,6 +55,7 @@ class MailChannel(OutputPlugin):
             writeitinstance = outbound_message.message.writeitinstance
             template = writeitinstance.mailit_template
         except:
+            logging.exception('Error getting instance or template')
             return False, False
 
         with override(writeitinstance.config.default_language):
@@ -118,8 +119,10 @@ class MailChannel(OutputPlugin):
                 }
             logging.info(log)
         except SMTPServerDisconnected, e:
+            logging.warning(e)
             return False, False
         except SMTPResponseException, e:
+            logging.warning(e)
             if e.smtp_code == 552:
                 return False, False
             return False, True

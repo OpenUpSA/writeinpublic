@@ -52,8 +52,12 @@ from nuntium.user_section.views import (
     WelcomeView,
     WriteItPopitUpdateView,
     WriteItInstanceWebHooksView,
-    WriteItInstanceCreateWebHooksView
+    WriteItInstanceCreateWebHooksView,
+    MessagesToContact,
+    MessageResend
 )
+
+
 from nuntium.user_section.stats import StatsView
 
 # Uncomment the next two lines to enable the admin:
@@ -96,6 +100,8 @@ managepatterns = patterns('',
         WriteItDeleteView.as_view(template_name="nuntium/profiles/writeitinstance_check_delete.html"),
         name='delete_an_instance'),
     url(r'^messages/(?P<pk>[-\d]+)/toggle-public/$', MessageTogglePublic.as_view(), name='toggle_public'),
+    url(r'^messages/to/(?P<pk>[-\d]+)', MessagesToContact.as_view(), name='messages_to_contact'),
+    url(r'^messages/(?P<pk>[-\d]+)/resend/$', MessageResend.as_view(), name='message_resend'),
     url(r'^moderation_accept/(?P<slug>[-\w]+)/?$', AcceptModerationView.as_view(), name='moderation_accept'),
     url(r'^moderation_reject/(?P<slug>[-\w]+)/?$', RejectModerationView.as_view(), name='moderation_rejected'),
     url(r'^welcome/$', WelcomeView.as_view(), name='welcome'),

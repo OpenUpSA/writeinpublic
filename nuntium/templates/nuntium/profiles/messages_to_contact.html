@@ -21,16 +21,12 @@
 
 {% block content %}
   <div class="page-header">
-    <h2>{% trans "Messages" %}</h2>
+    <h2>{% trans "Messages" %} to {{ person }}</h2>
     <a href="{% url 'writeitinstance_answernotification_update' subdomain=writeitinstance.slug %}" class="page-header__settings-link btn btn-default btn-sm"><i class="glyphicon glyphicon-wrench"></i> {% trans "Settings" %}</a>
   </div>
-  <div class="manager-overview">
-    {% blocktrans count message_count=writeitinstance.message_set.count %}
-    There is <strong>1</strong> message 
-    {% plural %}
-    There are <strong>{{ message_count }}</strong> messages 
-    {% endblocktrans %}
-  </div>
+
+    
+ 
     {% autopaginate message_list %}
       {% paginate %}
       <table class="table table-striped">
@@ -45,6 +41,7 @@
             	<th class="text-center">{% trans "Moderated?" %}</th>
             {% endif %}
             <th class="text-center">{% trans "Make private/public"%}</th>
+            <th class="text-center">Resend</th>
           </tr>
         </thead>
         <tbody>
@@ -54,12 +51,6 @@
               <h3><a class="explanation" data-toggle="tooltip" data-placement="right" title="{% trans "Link to message admin" %}" 
                 href="{% url 'message_detail_private' subdomain=writeitinstance.slug pk=message.pk %}">{{ message.subject }}</a> </h3>
               <p class="message-in-message-list__meta">
-
-                {% for person in message.people %}
-                  <a href="/en/manage/messages/to/{{person.id}}">{{person.email}}</a>
-                {% endfor %}
-
-
                 {% blocktrans with created=message.created|timesince author_name=message.author_name to=message.people|join_with_commas:LANGUAGE_CODE %}
                   Sent <strong>{{ created }}</strong> ago to <strong>{{ to }}</strong> from <strong>{{ author_name }}</strong>
                 {% endblocktrans %}
@@ -132,8 +123,36 @@
                 </div>
                 {% endif %}
             </td>
+            <td>
+              <form action="{% url 'toggle_public' pk=message.pk %}" method="post">{% csrf_token %}
+                <button class="btn btn-default btn-sm toggle-public" data-toggle="modal" data-target="#resend"><i class="fa fa-paper-plane"></i></button>
+              </form>
+            </td>
 
           </tr>
+          <div class="modal fade" id="resend" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <form action="{% url 'message_resend' pk=message.pk %}" method="post">{% csrf_token %}
+              <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Resend this message</h4>
+                  </div>
+                  <div class="modal-body">
+                    <p>Who would you like to resend this message to?</p>
+                    {% for person in message.people %}
+                      <div>
+                        <input type="checkbox" value="{{person.id}}" name="contact_ids"/> {{person}}
+                      </div>
+                    {% endfor %}
+                  </div>
+                  <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Resend</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
           {% empty %}
           <tr><td colspan="5" class="text-center">{% trans "You have no messages" %}</td></tr>
           {% endfor %}
@@ -158,4 +177,8 @@
     </div>
   </div>
 </div>
+
+
+
+
 {% endblock content %}

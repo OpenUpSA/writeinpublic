@@ -76,6 +76,29 @@ class OutboundMessageTestCase(TestCase):
         outbound_message = OutboundMessage.objects.get(id=outbound_message.id)
         self.assertEquals(outbound_message.status, "sent")
 
+    def test_successful_resend(self):
+        outbound_message = OutboundMessage.objects.create(
+            message=self.message,
+            contact=self.contact1,
+            site=Site.objects.get_current(),
+            )
+        outbound_message.send()
+
+        outbound_message = OutboundMessage.objects.get(id=outbound_message.id)
+        self.assertEquals(outbound_message.status, "sent")
+        outbound_message.status = 'ready'
+
+        outboundrecords = outbound_message.outboundmessagepluginrecord_set.filter(plugin__name = 'mail-channel')
+
+        for outboundrecord in outboundrecords:
+            outboundrecord.try_again = True
+            outboundrecord.save()
+
+        outbound_message.send()
+        self.assertEquals(outbound_message.status, "sent")
+
+
+
     def test_there_is_a_manager_that_retrieves_all_the_available_messages(self):
         outbound_message = OutboundMessage.objects.create(
             message=self.message,
