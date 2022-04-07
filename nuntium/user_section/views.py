@@ -2,12 +2,13 @@ import requests
 
 from django.contrib.auth.decorators import login_required
 from subdomains.utils import reverse
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, CreateView, DetailView, View, ListView, RedirectView
 from django.views.generic.edit import UpdateView, DeleteView, FormView
 from django.core.exceptions import ValidationError
+from django.views.generic.edit import FormMixin
 
 from mailit.forms import MailitTemplateForm
 
@@ -337,9 +338,32 @@ class ConfirmationTemplateUpdateView(UpdateTemplateWithWriteitBase):
     model = ConfirmationTemplate
 
 
-class MessagesPerWriteItInstance(LoginRequiredMixin, ListView):
+class MessagesPerWriteItInstance(LoginRequiredMixin, ListView, FormMixin):
     model = Message
     template_name = 'nuntium/profiles/messages_per_instance.html'
+
+    def post(self, request, *args, **kwargs):
+
+        contact_ids = request.POST.getlist('contact_ids')
+        
+        outboundmessages = OutboundMessage.objects.filter(message_id = request.POST['message'], contact_id__in = contact_ids)
+ 
+        messages = ''
+
+        for message in outboundmessages:
+            message.status = 'ready'
+            outboundrecords = message.outboundmessagepluginrecord_set.filter(plugin__name = 'mail-channel')
+
+            for outboundrecord in outboundrecords:
+                outboundrecord.try_again = True
+                outboundrecord.save()
+ 
+            message.save()
+            messages += str(message) + '<br/>'
+
+        view_messages.info(request, 'Message resent: ' + messages)
+        
+        return HttpResponseRedirect(reverse('messages_per_writeitinstance', subdomain=self.request.subdomain))
 
     def get_queryset(self):
         self.writeitinstance = get_object_or_404(WriteItInstance, slug=self.request.subdomain, owner=self.request.user)
@@ -348,23 +372,6 @@ class MessagesPerWriteItInstance(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(MessagesPerWriteItInstance, self).get_context_data(**kwargs)
         context['writeitinstance'] = self.writeitinstance
-        return context
-
-
-class MessagesToContact(LoginRequiredMixin, ListView):
-    model = Message
-    template_name = 'nuntium/profiles/messages_to_contact.html'
-
-    def get_queryset(self):
-        pk = self.kwargs.get('pk')
-        self.writeitinstance = get_object_or_404(WriteItInstance, slug=self.request.subdomain, owner=self.request.user)
-        return super(MessagesToContact, self).get_queryset().filter(person=pk)
-
-    def get_context_data(self, **kwargs):
-        context = super(MessagesToContact, self).get_context_data(**kwargs)
-        context['writeitinstance'] = self.writeitinstance
-        context['person'] = self.kwargs.get('pk')
-        
         return context
 
 
@@ -645,28 +652,28 @@ class MessageTogglePublic(RedirectView):
             view_messages.info(self.request, _("This message has been marked as private"))
         return reverse('messages_per_writeitinstance')
 
-class MessageResend(View):
-    def post(self, request, *args, **kwargs):
+# class MessageResend(View):
+#     def post(self, request, *args, **kwargs):
 
-        contact_ids = request.POST.getlist('contact_ids')
+#         contact_ids = request.POST.getlist('contact_ids')
         
-        outboundmessages = OutboundMessage.objects.filter(message_id = kwargs['pk'], contact_id__in = contact_ids)
+#         outboundmessages = OutboundMessage.objects.filter(message_id = kwargs['pk'], contact_id__in = contact_ids)
 
  
-        messages = ''
+#         messages = ''
 
-        for message in outboundmessages:
-            message.status = 'ready'
-            outboundrecords = message.outboundmessagepluginrecord_set.filter(plugin__name = 'mail-channel')
+#         for message in outboundmessages:
+#             message.status = 'ready'
+#             outboundrecords = message.outboundmessagepluginrecord_set.filter(plugin__name = 'mail-channel')
 
-            for outboundrecord in outboundrecords:
-                outboundrecord.try_again = True
-                outboundrecord.save()
+#             for outboundrecord in outboundrecords:
+#                 outboundrecord.try_again = True
+#                 outboundrecord.save()
  
-            message.save()
-            messages += str(message) + '<br/>'
+#             message.save()
+#             messages += str(message) + '<br/>'
 
-        return HttpResponse('<body>' + messages + '</body>')
+#         return HttpResponse('<body>' + messages + '</body>')
 
 
 
