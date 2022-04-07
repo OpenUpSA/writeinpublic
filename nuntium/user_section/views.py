@@ -650,32 +650,7 @@ class MessageTogglePublic(RedirectView):
             view_messages.info(self.request, _("This message has been marked as public"))
         else:
             view_messages.info(self.request, _("This message has been marked as private"))
-        return reverse('messages_per_writeitinstance')
-
-# class MessageResend(View):
-#     def post(self, request, *args, **kwargs):
-
-#         contact_ids = request.POST.getlist('contact_ids')
-        
-#         outboundmessages = OutboundMessage.objects.filter(message_id = kwargs['pk'], contact_id__in = contact_ids)
-
- 
-#         messages = ''
-
-#         for message in outboundmessages:
-#             message.status = 'ready'
-#             outboundrecords = message.outboundmessagepluginrecord_set.filter(plugin__name = 'mail-channel')
-
-#             for outboundrecord in outboundrecords:
-#                 outboundrecord.try_again = True
-#                 outboundrecord.save()
- 
-#             message.save()
-#             messages += str(message) + '<br/>'
-
-#         return HttpResponse('<body>' + messages + '</body>')
-
-
+        return reverse('messages_per_writeitinstance', subdomain=self.request.subdomain)
 
 
 class ContactUsView(TemplateView):

@@ -124,8 +124,8 @@
                   {% endif %}
               </td>
               <td>
-                {% for person in message.people %}
-                    <input type="hidden" value="{{person.id}}-{{person}}" class="contact_ids"/>
+                {% for contact in message.people %}
+                    <input type="hidden" value="{{contact.id}}:{{contact}}" class="contact_ids"/>
                 {% endfor %}
                 <button class="btn btn-default btn-sm resend" data-message="{{message.pk}}"><i class="fa fa-paper-plane"></i></button>
               </td>
@@ -188,9 +188,8 @@
       $('#resend .contact-list').html('');
       
       for(i = 0; i < contacts.length; i++) {
-        console.log();
-        let val = $(contacts[i]).val().split('-')[0];
-        let name = $(contacts[i]).val().split('-')[1];
+        let val = $(contacts[i]).val().split(':')[0];
+        let name = $(contacts[i]).val().split(':')[1];
         
         $('#resend .contact-list').append(`
           <div>
