@@ -18,6 +18,8 @@ from django.contrib.contenttypes.models import ContentType
 
 from plugin_mock.mental_message_plugin import MentalMessage, FatalException, TryAgainException
 
+from nuntium.user_section.views import MessagesPerWriteItInstance
+from subdomains.utils import reverse
 
 class OutboundMessageTestCase(TestCase):
     def setUp(self):
@@ -96,6 +98,23 @@ class OutboundMessageTestCase(TestCase):
 
         outbound_message.send()
         self.assertEquals(outbound_message.status, "sent")
+
+
+    def test_message_resend_form(self):
+        outbound_message = OutboundMessage.objects.create(
+            message=self.message,
+            contact=self.contact1,
+            site=Site.objects.get_current()
+        )
+        outbound_message.send()
+
+        response = self.client.post(reverse('messages_per_writeitinstance', subdomain=WriteItInstance.objects.get(id=1).slug), data={
+            'contact_ids': [self.contact1.id],
+            'message': outbound_message.id
+        })
+
+
+        self.assertEquals(outbound_message.status, 'ready')
 
 
 
