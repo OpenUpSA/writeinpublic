@@ -108,12 +108,17 @@ class OutboundMessageTestCase(TestCase):
         )
         outbound_message.send()
 
-        response = self.client.post(reverse('messages_per_writeitinstance', subdomain=WriteItInstance.objects.get(id=1).slug), data={
+        data = {
             'contact_ids': [self.contact1.id],
             'message': outbound_message.id
-        })
+        }
 
+        self.client.login(username=WriteItInstance.objects.get(id=1).owner.username, password='admin')
 
+        response = self.client.post(reverse('messages_per_writeitinstance', subdomain=WriteItInstance.objects.get(id=1).slug), data=data)
+
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.url, reverse('messages_per_writeitinstance', subdomain=WriteItInstance.objects.get(id=1).slug))
         self.assertEquals(outbound_message.status, 'ready')
 
 
