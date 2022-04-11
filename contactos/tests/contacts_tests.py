@@ -17,6 +17,7 @@ import simplejson as json
 from instance.models import WriteItInstance
 from django.db.models import Q
 from django.contrib.sites.models import Site
+from django.test.utils import override_settings
 
 
 class ContactTestCase(TestCase):
@@ -225,10 +226,13 @@ class ContactTestCase(TestCase):
             self.assertEquals(outbound_message.status, 'ready')
 
 
+
+
+@override_settings(FLAG_BOUNCED_CONTACTS = True)
 class ResendOutboundMessages(TestCase):
     def setUp(self):
         super(ResendOutboundMessages, self).setUp()
-
+        
         self.contact = Contact.objects.get(value="mailnoexistente@ciudadanointeligente.org")
         self.contact.is_bounced = True
         self.contact.save()
@@ -255,15 +259,17 @@ class ResendOutboundMessages(TestCase):
         self.answer.send_back()
 
     def test_resend_outbound_messages(self):
+        
         self.contact.resend_messages()
-
         outbound_messages = OutboundMessage.objects.filter(contact=self.contact)
         current_amount_of_mails_sent_after_resend_messages = len(mail.outbox)
         self.assertEquals(current_amount_of_mails_sent_after_resend_messages - self.previous_amount_of_mails, outbound_messages.count())
         for outbound_message in outbound_messages:
             self.assertEquals(outbound_message.status, "sent")
 
+    
     def test_resends_only_failed_outbound_messages(self):
+        
         message = Message.objects.get(id=1)
         OutboundMessage.objects.create(message=message, contact=self.contact, status="ready", site=Site.objects.get_current())
         self.contact.resend_messages()
@@ -272,10 +278,9 @@ class ResendOutboundMessages(TestCase):
         self.outbound_messages.count())
 
     def test_it_sets_the_is_bounced_status_to_false_of_the_contact(self):
+        
         self.contact.resend_messages()
-
         contact = Contact.objects.get(id=self.contact.id)
-
         self.assertFalse(contact.is_bounced)
 
 

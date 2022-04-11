@@ -52,8 +52,10 @@ from nuntium.user_section.views import (
     WelcomeView,
     WriteItPopitUpdateView,
     WriteItInstanceWebHooksView,
-    WriteItInstanceCreateWebHooksView
+    WriteItInstanceCreateWebHooksView,
 )
+
+
 from nuntium.user_section.stats import StatsView
 
 # Uncomment the next two lines to enable the admin:

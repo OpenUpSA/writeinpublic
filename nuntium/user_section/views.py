@@ -1,13 +1,15 @@
 import requests
 
 from django.contrib.auth.decorators import login_required
+from urllib3 import HTTPResponse
 from subdomains.utils import reverse
-from django.http import HttpResponse, Http404
-from django.shortcuts import get_object_or_404
+from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseBadRequest
+from django.shortcuts import get_object_or_404, redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, CreateView, DetailView, View, ListView, RedirectView
 from django.views.generic.edit import UpdateView, DeleteView, FormView
 from django.core.exceptions import ValidationError
+from django.views.generic.edit import FormMixin
 
 from mailit.forms import MailitTemplateForm
 
@@ -16,7 +18,8 @@ from popolo_sources.models import PopoloSource
 from ..models import Message,\
     NewAnswerNotificationTemplate, ConfirmationTemplate, \
     Answer, Moderation, \
-    AnswerWebHook
+    AnswerWebHook, \
+    Contact, OutboundMessage
 from .forms import WriteItInstanceBasicForm, \
     NewAnswerNotificationTemplateForm, ConfirmationTemplateForm, \
     WriteItInstanceAnswerNotificationForm, \
@@ -34,6 +37,9 @@ import json
 from nuntium.tasks import pull_from_popolo_json
 from nuntium.user_section.forms import WriteItPopitUpdateForm
 from django.contrib.sites.models import Site
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class UserAccountView(TemplateView):
@@ -333,9 +339,35 @@ class ConfirmationTemplateUpdateView(UpdateTemplateWithWriteitBase):
     model = ConfirmationTemplate
 
 
-class MessagesPerWriteItInstance(LoginRequiredMixin, ListView):
+class MessagesPerWriteItInstance(LoginRequiredMixin, ListView, FormMixin):
     model = Message
     template_name = 'nuntium/profiles/messages_per_instance.html'
+
+    def post(self, request, *args, **kwargs):
+
+        contact_ids = [int(id) for id in request.POST.getlist('contact_ids')]
+        
+        outboundmessages = OutboundMessage.objects.filter(message_id = request.POST['message'], contact_id__in = contact_ids)
+
+        if outboundmessages.count() == 0:
+            return HttpResponseBadRequest()
+ 
+        feedbackmessages = ''
+
+        for outboundmessage in outboundmessages:
+            outboundmessage.status = 'ready'
+            outboundrecords = outboundmessage.outboundmessagepluginrecord_set.filter(plugin__name = 'mail-channel')
+
+            for outboundrecord in outboundrecords:
+                outboundrecord.try_again = True
+                outboundrecord.save()
+ 
+            outboundmessage.save()
+            feedbackmessages += str(outboundmessage) + '<br/>'
+
+        view_messages.info(request, 'Message resent: ' + feedbackmessages)
+        
+        return HttpResponseRedirect(reverse('messages_per_writeitinstance', subdomain=self.request.subdomain))
 
     def get_queryset(self):
         self.writeitinstance = get_object_or_404(WriteItInstance, slug=self.request.subdomain, owner=self.request.user)
@@ -350,6 +382,7 @@ class MessagesPerWriteItInstance(LoginRequiredMixin, ListView):
 class MessageDetail(WriteItInstanceOwnerMixin, DetailView):
     model = Message
     template_name = "nuntium/profiles/message_detail.html"
+
 
 
 class AnswerEditMixin(View):
@@ -683,3 +716,4 @@ class WriteItInstanceCreateWebHooksView(CreateView):
             'writeitinstance_webhooks',
             subdomain=self.writeitinstance.slug,
             )
+

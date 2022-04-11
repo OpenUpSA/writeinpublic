@@ -19,6 +19,7 @@ from mailit.bin.handleemail import (
 )
 from mailit.exceptions import CouldNotFindIdentifier
 from mailit.models import BouncedMessageRecord
+from django.test.utils import override_settings
 
 
 class PostMock():
@@ -117,7 +118,7 @@ class GetOutboundMessageIdentifierTestCase(TestCase):
         result = get_outbound_message_identifier(recipient)
         self.assertEquals(result, "25459cface3411eaa5e00242ac110006")
 
-
+@override_settings(FLAG_BOUNCED_CONTACTS = True)
 class IncomingEmailHandlerTestCase(ResourceTestCase):
     def setUp(self):
         super(IncomingEmailHandlerTestCase, self).setUp()
@@ -303,7 +304,7 @@ class HandleBounces(TestCase):
 
             post.assert_called_with(self.where_to_post_a_bounce, data=data, headers=expected_headers)
 
-
+@override_settings(FLAG_BOUNCED_CONTACTS = True)
 class BouncedMessageRecordTestCase(TestCase):
     def setUp(self):
         super(BouncedMessageRecordTestCase, self).setUp()
@@ -341,6 +342,7 @@ class BouncedMessageRecordTestCase(TestCase):
         self.assertEquals(bounced_message.bounce_text, email_answer.content_text)
 
 
+@override_settings(FLAG_BOUNCED_CONTACTS = True)
 class BouncedMailInAmazonBug(TestCase):
     def setUp(self):
         super(BouncedMailInAmazonBug, self).setUp()
@@ -386,19 +388,36 @@ class FlaggingBouncedMail(TestCase):
         self.answer = self.handler.handle(self.bounced_email)
         self.answer.send_back()
 
-    def test_it_marks_the_contact_as_a_bounce(self):
-        contact = Contact.objects.get(value="mailnoexistente@ciudadanointeligente.org")
-        self.assertTrue(contact.is_bounced)
-
     def test_it_does_not_mark_the_contact_as_bounced(self):
         contact = Contact.objects.get(value="mailnoexistente@ciudadanointeligente.org")
         self.assertFalse(contact.is_bounced)
 
-    def test_it_marks_the_contact_as_bounced_when_flag_bounced_contact_is_true(self):
-        config.FLAG_BOUNCED_CONTACTS = True
-        contact = Contact.objects.get(value="mailnoexistente@ciudadanointeligente.org")
-        self.assertFalse(contact.is_bounced)
+@override_settings(FLAG_BOUNCED_CONTACTS = True)
+class FlaggingBouncedMailWriteItDefault(TestCase):
 
+    def setUp(self):
+        super(FlaggingBouncedMailWriteItDefault, self).setUp()
+        self.message = Message.objects.get(id=1)
+        self.contact = Contact.objects.get(value="mailnoexistente@ciudadanointeligente.org")
+        self.outbound_message = OutboundMessage.objects.create(message=self.message, contact=self.contact, site=Site.objects.get_current())
+        identifier = OutboundMessageIdentifier.objects.get(outbound_message=self.outbound_message)
+        identifier.key = "4aaaabbb"
+        identifier.save()
+
+        self.bounced_email = ""
+        with open('mailit/tests/fixture/bounced_mail2.txt') as f:
+            self.bounced_email += f.read()
+        f.close()
+        self.handler = EmailHandler(answer_class=OutboundMessageAnswer)
+        self.answer = self.handler.handle(self.bounced_email)
+        self.answer.send_back()
+
+    def test_it_marks_the_contact_as_bounced_when_flag_bounced_contact_is_true(self):
+        contact = Contact.objects.get(value="mailnoexistente@ciudadanointeligente.org")
+        self.assertTrue(contact.is_bounced)
+
+
+@override_settings(FLAG_BOUNCED_CONTACTS = True)
 class BouncedMailInGmail(TestCase):
     def setUp(self):
         super(BouncedMailInGmail, self).setUp()

@@ -10,7 +10,6 @@ from mailit.models import RawIncomingEmail
 from mailit.bin.handleemail import EmailHandler
 from mailit.exceptions import TemporaryFailure
 
-
 class ManagementCommandAnswer(TestCase):
     def setUp(self):
         super(ManagementCommandAnswer, self).setUp()
@@ -32,6 +31,7 @@ class ManagementCommandAnswer(TestCase):
         self.assertFalse(email_answer.is_bounced)
 
 
+@override_settings(FLAG_BOUNCED_CONTACTS = True)
 class ManagementCommandAnswerBehaviour(TestCase):
     def setUp(self):
         super(ManagementCommandAnswerBehaviour, self).setUp()
@@ -64,6 +64,7 @@ class ManagementCommandAnswerBehaviour(TestCase):
 
     def test_it_handles_bounces_in_send_back_function(self):
         #the email is a bounce
+
         self.email_answer.is_bounced = True
         self.email_answer.send_back()
 
@@ -116,6 +117,7 @@ def temporary_fail_mock():
     return read_lines('mailit/tests/fixture/temporary.txt')
 
 
+@override_settings(FLAG_BOUNCED_CONTACTS = True)
 class HandleIncomingEmailCommand(TestCase):
     def setUp(self):
         super(HandleIncomingEmailCommand, self).setUp()
