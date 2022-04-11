@@ -58,7 +58,7 @@ class OutboundMessageTestCase(TestCase):
             subject='Fiera es una perra feroz',
             writeitinstance=self.message.writeitinstance,
             persons=[self.contact1.person],
-            )
+        )
 
         new_outbound_messages = OutboundMessage.objects.filter(message=message)
 
@@ -104,21 +104,31 @@ class OutboundMessageTestCase(TestCase):
         outbound_message = OutboundMessage.objects.create(
             message=self.message,
             contact=self.contact1,
-            site=Site.objects.get_current()
+            site=Site.objects.get_current(),
         )
+
+        outbound_message = OutboundMessage.objects.get(id=outbound_message.id)
         outbound_message.send()
 
         data = {
             'contact_ids': [self.contact1.id],
-            'message': outbound_message.id
+            'message': self.message.id
         }
 
-        self.client.login(username=WriteItInstance.objects.get(id=1).owner.username, password='admin')
+        self.client.login(username=self.message.writeitinstance.owner.username, password='admin')
 
-        response = self.client.post(reverse('messages_per_writeitinstance', subdomain=WriteItInstance.objects.get(id=1).slug), data=data)
+        print(self.message.id)
+        print(self.contact1.id)
+        print(self.message.writeitinstance.owner.username)
+        print(self.message.writeitinstance.slug)
+
+        response = self.client.post(reverse('messages_per_writeitinstance', subdomain=self.message.writeitinstance.slug), data=data)
+
+        print(response.url)
 
         self.assertEquals(response.status_code, 302)
-        self.assertEquals(response.url, reverse('messages_per_writeitinstance', subdomain=WriteItInstance.objects.get(id=1).slug))
+        self.assertEquals(response.url, reverse('messages_per_writeitinstance', subdomain=self.message.writeitinstance.slug))
+
         self.assertEquals(outbound_message.status, 'ready')
 
 

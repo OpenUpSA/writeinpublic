@@ -1,8 +1,9 @@
 import requests
 
 from django.contrib.auth.decorators import login_required
+from urllib3 import HTTPResponse
 from subdomains.utils import reverse
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, CreateView, DetailView, View, ListView, RedirectView
@@ -344,9 +345,23 @@ class MessagesPerWriteItInstance(LoginRequiredMixin, ListView, FormMixin):
 
     def post(self, request, *args, **kwargs):
 
-        contact_ids = request.POST.getlist('contact_ids')
+        contact_ids = [int(id) for id in request.POST.getlist('contact_ids')]
         
+        outboundmessages1 = OutboundMessage.objects.all()
         outboundmessages = OutboundMessage.objects.filter(message_id = request.POST['message'], contact_id__in = contact_ids)
+
+        print('------')
+        print(request.POST['message'])
+        print(contact_ids)
+        print(request.subdomain)
+
+
+        if outboundmessages.count() == 0:
+            
+            for message in outboundmessages1:
+                print(str(message.id) + '::' + str(message.contact_id))
+
+            return HttpResponseBadRequest()
  
         messages = ''
 
