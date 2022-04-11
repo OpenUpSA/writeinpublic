@@ -347,36 +347,25 @@ class MessagesPerWriteItInstance(LoginRequiredMixin, ListView, FormMixin):
 
         contact_ids = [int(id) for id in request.POST.getlist('contact_ids')]
         
-        outboundmessages1 = OutboundMessage.objects.all()
         outboundmessages = OutboundMessage.objects.filter(message_id = request.POST['message'], contact_id__in = contact_ids)
 
-        print('------')
-        print(request.POST['message'])
-        print(contact_ids)
-        print(request.subdomain)
-
-
         if outboundmessages.count() == 0:
-            
-            for message in outboundmessages1:
-                print(str(message.id) + '::' + str(message.contact_id))
-
             return HttpResponseBadRequest()
  
-        messages = ''
+        feedbackmessages = ''
 
-        for message in outboundmessages:
-            message.status = 'ready'
-            outboundrecords = message.outboundmessagepluginrecord_set.filter(plugin__name = 'mail-channel')
+        for outboundmessage in outboundmessages:
+            outboundmessage.status = 'ready'
+            outboundrecords = outboundmessage.outboundmessagepluginrecord_set.filter(plugin__name = 'mail-channel')
 
             for outboundrecord in outboundrecords:
                 outboundrecord.try_again = True
                 outboundrecord.save()
  
-            message.save()
-            messages += str(message) + '<br/>'
+            outboundmessage.save()
+            feedbackmessages += str(outboundmessage) + '<br/>'
 
-        view_messages.info(request, 'Message resent: ' + messages)
+        view_messages.info(request, 'Message resent: ' + feedbackmessages)
         
         return HttpResponseRedirect(reverse('messages_per_writeitinstance', subdomain=self.request.subdomain))
 

@@ -99,40 +99,6 @@ class OutboundMessageTestCase(TestCase):
         outbound_message.send()
         self.assertEquals(outbound_message.status, "sent")
 
-
-    def test_message_resend_form(self):
-        outbound_message = OutboundMessage.objects.create(
-            message=self.message,
-            contact=self.contact1,
-            site=Site.objects.get_current(),
-        )
-
-        outbound_message = OutboundMessage.objects.get(id=outbound_message.id)
-        outbound_message.send()
-
-        data = {
-            'contact_ids': [self.contact1.id],
-            'message': self.message.id
-        }
-
-        self.client.login(username=self.message.writeitinstance.owner.username, password='admin')
-
-        print(self.message.id)
-        print(self.contact1.id)
-        print(self.message.writeitinstance.owner.username)
-        print(self.message.writeitinstance.slug)
-
-        response = self.client.post(reverse('messages_per_writeitinstance', subdomain=self.message.writeitinstance.slug), data=data)
-
-        print(response.url)
-
-        self.assertEquals(response.status_code, 302)
-        self.assertEquals(response.url, reverse('messages_per_writeitinstance', subdomain=self.message.writeitinstance.slug))
-
-        self.assertEquals(outbound_message.status, 'ready')
-
-
-
     def test_there_is_a_manager_that_retrieves_all_the_available_messages(self):
         outbound_message = OutboundMessage.objects.create(
             message=self.message,

@@ -185,6 +185,39 @@ class ModerationMessagesTestCase(TestCase):
         self.assertTrue(self.private_message.moderated)
         self.assertEquals(outbound_message_to_pedro.status, 'ready')
 
+    def test_message_resend_form(self):
+        self.confirmation.confirmated_at = datetime.datetime.now()
+        self.confirmation.save()
+        self.private_message.confirmated = True
+        self.private_message.save()
+
+        self.private_message.moderate()
+        outbound_message_to_pedro = OutboundMessage.objects.get(message=self.private_message)
+
+        self.assertTrue(self.private_message.moderated)
+        self.assertEquals(outbound_message_to_pedro.status, 'ready')
+
+        outbound_message_to_pedro.send()
+        self.assertEquals(outbound_message_to_pedro.status, 'sent')
+
+        data = {
+            'contact_ids': [outbound_message_to_pedro.contact.pk],
+            'message': self.private_message.id
+        }
+
+        self.client.login(username=self.owner.username, password='feroz')
+
+        response = self.client.post(reverse('messages_per_writeitinstance', subdomain=self.private_message.writeitinstance.slug), data=data)
+
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.url, reverse('messages_per_writeitinstance', subdomain=self.private_message.writeitinstance.slug))
+
+        outbound_message_to_pedro.refresh_from_db()
+        self.assertEquals(outbound_message_to_pedro.status, 'ready')
+
+
+
+
     def test_message_that_has_not_been_confirmed_cannot_be_moderated(self):
         # this message has not been confirmed
         # and is private therefore requires moderation
@@ -285,6 +318,7 @@ class ModerationMessagesTestCase(TestCase):
         self.assertEquals(outbound_message_to_pedro.status, 'ready')
         private_message = Message.objects.get(id=self.private_message.id)
         self.assertTrue(private_message.moderated)
+    
 
     def test_moderation_get_success_url(self):
         expected_url = reverse('moderation_accept',
