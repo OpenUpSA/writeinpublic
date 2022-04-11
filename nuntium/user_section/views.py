@@ -345,12 +345,12 @@ class MessagesPerWriteItInstance(LoginRequiredMixin, ListView, FormMixin):
 
     def post(self, request, *args, **kwargs):
 
-        contact_ids = [int(id) for id in request.POST.getlist('contact_ids')]
-        
-        outboundmessages = OutboundMessage.objects.filter(message_id = request.POST['message'], contact_id__in = contact_ids)
+        message_id = request.POST['message']
+        person_ids = [int(id) for id in request.POST.getlist('person_ids')]
+        outboundmessages = OutboundMessage.objects.filter(message_id = message_id, contact__person__in = person_ids)
 
         if outboundmessages.count() == 0:
-            return HttpResponseBadRequest()
+            return HttpResponseBadRequest("No matching outbound messages found for message {0} and person IDs {1}".format(message_id, person_ids))
  
         feedbackmessages = ''
 

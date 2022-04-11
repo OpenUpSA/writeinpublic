@@ -124,8 +124,8 @@
                   {% endif %}
               </td>
               <td>
-                {% for contact in message.people %}
-                    <input type="hidden" value="{{contact.id}}:{{contact}}" class="contact_ids"/>
+                {% for person in message.people %}
+                    <input type="hidden" value="{{person.id}}:{{person}}" class="person_ids"/>
                 {% endfor %}
                 <button class="btn btn-default btn-sm resend" data-message="{{message.pk}}"><i class="fa fa-paper-plane"></i></button>
               </td>
@@ -168,7 +168,7 @@
         </div>
         <div class="modal-body">
           <p>Who would you like to resend this message to?</p>
-          <div class="contact-list"></div>
+          <div class="person-list"></div>
           <input type="hidden" name="message" value="" id="message_id"/>
         </div>
         <div class="modal-footer">
@@ -184,16 +184,16 @@
   $(document).ready(function() {
     $('.resend').click(function() {
       
-      let contacts = $('input', $(this).parent())
-      $('#resend .contact-list').html('');
+      let persons = $('input', $(this).parent())
+      $('#resend .person-list').html('');
       
-      for(i = 0; i < contacts.length; i++) {
-        let val = $(contacts[i]).val().split(':')[0];
-        let name = $(contacts[i]).val().split(':')[1];
+      for(i = 0; i < persons.length; i++) {
+        let val = $(persons[i]).val().split(':')[0];
+        let name = $(persons[i]).val().split(':')[1];
         
-        $('#resend .contact-list').append(`
+        $('#resend .person-list').append(`
           <div>
-            <input type="checkbox" value="${val}" name="contact_ids"/> ${name}
+            <input type="checkbox" value="${val}" name="person_ids"/> ${name}
           </div>`
         )
       }

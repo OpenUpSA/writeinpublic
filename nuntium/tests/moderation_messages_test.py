@@ -201,7 +201,7 @@ class ModerationMessagesTestCase(TestCase):
         self.assertEquals(outbound_message_to_pedro.status, 'sent')
 
         data = {
-            'contact_ids': [outbound_message_to_pedro.contact.pk],
+            'person_ids': [outbound_message_to_pedro.contact.pk],
             'message': self.private_message.id
         }
 
