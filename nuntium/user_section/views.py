@@ -350,7 +350,7 @@ class MessagesPerWriteItInstance(LoginRequiredMixin, ListView, FormMixin):
         outboundmessages = OutboundMessage.objects.filter(message_id = request.POST['message'], contact_id__in = contact_ids)
 
         if outboundmessages.count() == 0:
-            return HttpResponseBadRequest()
+            return HttpResponseBadRequest("No matching outbound messages found")
  
         feedbackmessages = ''
 
