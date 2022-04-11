@@ -169,6 +169,12 @@ def create_contactos(person_object, writeitinstance):
     enable_contacts = determine_if_person_is_current(person_object)
     for contact_detail in person_object.contact_details.all():
         if contact_detail.contact_type == 'email':
+            # Resending functionality for handling bounces and blocks
+            # assumes that the original contact related to the relevant 
+            # OutboundMessage is updated with a corrected email addres value,
+            # rather than being replaced.
+            #
+            # If this behaviour changes, that will also need attention.
             contact, created = Contact.objects.get_or_create(
                 contact_type=contact_type,
                 writeitinstance=writeitinstance,

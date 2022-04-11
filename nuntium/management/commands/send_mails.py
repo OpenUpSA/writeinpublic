@@ -4,7 +4,7 @@ from django.contrib.sites.models import Site
 from ...models import OutboundMessage
 import logging
 
-logging.basicConfig(filename='send_mails.log', level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 
 def send_mails():
