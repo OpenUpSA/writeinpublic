@@ -363,7 +363,7 @@ class MessagesPerWriteItInstance(LoginRequiredMixin, ListView, FormMixin):
                 outboundrecord.save()
  
             outboundmessage.save()
-            feedbackmessages += str(outboundmessage) + '<br/>'
+            feedbackmessages += str(outboundmessage)
 
         view_messages.info(request, 'Message resent: ' + feedbackmessages)
         
