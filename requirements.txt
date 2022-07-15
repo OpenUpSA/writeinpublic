@@ -6,7 +6,7 @@ billiard==3.3.0.23
 celery==3.1.25
 celery-haystack==0.10
 cffi==1.7.0
-codecov==2.0.15
+codecov==2.0.16
 contextlib2==0.5.3
 cryptography==2.0.3
 django-environ==0.4.5
