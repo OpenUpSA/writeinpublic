@@ -72,7 +72,7 @@ sentry-sdk==0.14.3
 simplejson==3.8.2
 six==1.10.0
 slumber==0.7.1
-sqlparse==0.3.0
+sqlparse==0.4.4
 static==0.4
 static3==0.7.0
 transifex-client==0.12.1
