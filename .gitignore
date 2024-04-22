@@ -34,3 +34,5 @@ conf/local_settings.py
 conf/local_settings.py.deployed
 /.static
 /.venv
+
+*.sql
