@@ -16,6 +16,8 @@ Installation instructions for developers are below. If you'd like to integrate W
 Production deployment
 =====================
 
+Note this project relies on outdate software like ElasticSearch 1.
+
 Provide these environment variables:
 
 | Key                   | Description
