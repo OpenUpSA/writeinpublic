@@ -33,6 +33,7 @@ Provide these environment variables:
 | SENTRY_DSN            | Optional - provide the DSN to enable Sentry error logging
 | SESSION_COOKIE_DOMAIN | start with dot to support subdomains e.g. `.writeinpublic.yourtdomain.com`
 | TIME_ZONE             | Optional - e.g. `Africa/Johannesburg`
+| RABBITMQ_URL          | 
 
 Run the django web service, the celery worker, and celery beat for scheduled tasks.
 
