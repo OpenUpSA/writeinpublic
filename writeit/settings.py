@@ -281,8 +281,7 @@ LOGGING = {
             'format': '%(levelname)s %(message)s'
         },
     },
-    'handlers': {
-        'console': {
+    'handlers': {        'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
@@ -290,7 +289,7 @@ LOGGING = {
     },
     'loggers': {
         'django.request': {
-            'handlers': ['mail_admins', 'console'],
+            'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
         },
