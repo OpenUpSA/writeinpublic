@@ -1,3 +1,5 @@
 # robotstxt.org/
+Crawl-delay: 120
 
 User-agent: *
+Disallow: /mailreporter/
