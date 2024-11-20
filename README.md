@@ -63,7 +63,7 @@ Handle message delivery logging web hooks
 Configure the sendgrid email event web hook to POST to `/mailreporter/`
 
 
-Local development using docker-compose
+Local development using docker compose
 ======================================
 
 This directory is mapped as a volume in the app. This can result in file permission errors like `EACCES: permission denied`. File permissions are generally based on UID integers and not usernames, so it doesn't matter what users are called, UIDs have to match or be mapped to the same numbers between the host and container.
@@ -74,23 +74,23 @@ The easiest solution is to make this directory world-writable so that the contai
 
     sudo find . -type d -exec chmod 777 '{}' \;
 
-Another good option is to specify the user ID to run as in the container. A persistent way to do that is by specifying `user: ${UID}:${GID}` in a `docker-compose.yml` file, perhaps used as an overlay, and specifying your host user's IDs in an environment file used by docker-compose, e.g. `.env`.
+Another good option is to specify the user ID to run as in the container. A persistent way to do that is by specifying `user: ${UID}:${GID}` in a `docker compose.yml` file, perhaps used as an overlay, and specifying your host user's IDs in an environment file used by docker compose, e.g. `.env`.
 
 Install database schema
 
-    docker-compose run --rm web ./manage.py migrate
+    docker compose run --rm web ./manage.py migrate
 
 Compile translations
 
-    docker-compose run --rm web ./manage.py compilemessages
+    docker compose run --rm web ./manage.py compilemessages
 
 You can load some fixtures with:
 
-    docker-compose run --rm web ./manage.py loaddata example_data.yaml
+    docker compose run --rm web ./manage.py loaddata example_data.yaml
 
 Then run the development server with:
 
-    docker-compose up
+    docker compose up
 
 And visit http://127.0.0.1.xip.io:8000 on your host machine to use WriteIt.
 
@@ -99,7 +99,7 @@ You can enable the [debug-toolbar](https://django-debug-toolbar.readthedocs.io/e
 
 ### Background jobs
 
-Background job processes are also run by docker-compose in development.
+Background job processes are also run by docker compose in development.
 
 Background jobs are run by the Celery worker
 
@@ -119,7 +119,7 @@ This sends emails to recipients and periodically re-sync contacts from
 remote sources.
 
 
-Manual Installation (without docker-compose)
+Manual Installation (without docker compose)
 ============================================
 
 System Requirements
