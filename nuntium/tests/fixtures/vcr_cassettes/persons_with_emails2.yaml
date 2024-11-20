@@ -19,7 +19,7 @@
                     ]
                 },
                 "method": "GET",
-                "uri": "http://whatever.127.0.0.1.xip.io:3000/api/v0.1/export.json"
+                "uri": "http://whatever.127.0.0.1.nip.io:3000/api/v0.1/export.json"
             },
             "response": {
                 "status": {

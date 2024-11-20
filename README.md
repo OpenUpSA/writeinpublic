@@ -78,21 +78,21 @@ Another good option is to specify the user ID to run as in the container. A pers
 
 Install database schema
 
-    docker compose run --rm web ./manage.py migrate
+    docker compose run web ./manage.py migrate
 
 Compile translations
 
-    docker compose run --rm web ./manage.py compilemessages
+    docker compose run web ./manage.py compilemessages
 
 You can load some fixtures with:
 
-    docker compose run --rm web ./manage.py loaddata example_data.yaml
+    docker compose run web ./manage.py loaddata example_data.yaml
 
 Then run the development server with:
 
     docker compose up
 
-And visit http://127.0.0.1.xip.io:8000 on your host machine to use WriteIt.
+And visit http://127.0.0.1.nip.io:8000 on your host machine to use WriteIt.
 
 You can enable the [debug-toolbar](https://django-debug-toolbar.readthedocs.io/en/latest/) by setting `DJANGO_DEBUG_TOOLBAR=true`
 

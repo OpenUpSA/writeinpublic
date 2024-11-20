@@ -26,7 +26,7 @@ services:
       - ELASTICSEARCH_INDEX=writeinpublic
       - ELASTICSEARCH_URL=http://elasticsearch:9200/
       - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
-      - SESSION_COOKIE_DOMAIN=127.0.0.1.xip.io
+      - SESSION_COOKIE_DOMAIN=127.0.0.1.nip.io
 
   worker:
     build: .

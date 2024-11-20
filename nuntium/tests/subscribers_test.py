@@ -203,7 +203,7 @@ class NewAnswerNotificationToSubscribers(TestCase):
         message_body = mail.outbox[0].body
 
         self.assertIn(
-            'http://instance1.127.0.0.1.xip.io:8000/fa/thread/subject-1/',
+            'https://instance1.127.0.0.1.nip.io:8000/fa/thread/subject-1/',
             message_body)
 
     def test_answer_notification_with_html(self):
