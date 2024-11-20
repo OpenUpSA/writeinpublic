@@ -155,10 +155,10 @@ class MailSendingTestCase(TestCase):
         # Note that the '/fa/' part of these links is what we're
         # really looking for:
         self.assertIn(
-            'via instance 1 (http://instance1.127.0.0.1.xip.io:8000/fa/)',
+            'via instance 1 (https://instance1.127.0.0.1.nip.io:8000/fa/)',
             message.body)
         self.assertIn(
-            'will be published at http://instance1.127.0.0.1.xip.io:8000/fa/thread/subject-1/',
+            'will be published at https://instance1.127.0.0.1.nip.io:8000/fa/thread/subject-1/',
             message.body)
 
     @override_settings(EMAIL_SUBJECT_PREFIX='[WriteIT]')
