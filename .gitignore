@@ -36,3 +36,5 @@ conf/local_settings.py.deployed
 /.venv
 
 *.sql
+
+*.env
