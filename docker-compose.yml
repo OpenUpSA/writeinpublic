@@ -65,7 +65,7 @@ services:
       - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 
   db:
-    image: postgres:9.6
+    image: postgres:12.19
     environment:
       - POSTGRES_USER=writeinpublic
       - POSTGRES_PASSWORD=devpassword
