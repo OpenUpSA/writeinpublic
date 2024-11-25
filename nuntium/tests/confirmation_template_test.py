@@ -304,7 +304,7 @@ class SendConfirmationEmailTestCase(TestCase):
 You just submitted a message via Test WriteIt Instance. Please visit
 the following link to confirm you want to send this message
 
-http://test-writeit-instance.127.0.0.1.xip.io:8000/en/write/sign/fakekey/
+https://test-writeit-instance.127.0.0.1.nip.io:8000/en/write/sign/fakekey/
 
 (If you can\u2019t click the link, try copying and pasting it into your
 browser\u2019s address bar)

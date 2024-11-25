@@ -451,7 +451,7 @@ class VersionView(View):
             ).strip()
             result['git_version'] = git_version
         except (OSError, subprocess.CalledProcessError):
-            pass
+            result['git_version'] = 'unknown'
 
         try:
             writeitinstance = WriteItInstance.objects.get(slug=self.request.subdomain)

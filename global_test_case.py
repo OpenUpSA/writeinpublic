@@ -104,7 +104,7 @@ class WriteItRequestFactory(RequestFactory):
     it determines from the url what the subdomain is.
     '''
 
-    def get(self, path, data={}, secure=False, **extra):
+    def get(self, path, data={}, secure=True, **extra):
         path, subdomain, domain = get_path_and_subdomain(path, **extra)
         extra.update({
             'SERVER_NAME': str(domain),
@@ -114,7 +114,7 @@ class WriteItRequestFactory(RequestFactory):
             request.subdomain = subdomain
         return request
 
-    def post(self, path, data={}, secure=False, **extra):
+    def post(self, path, data={}, secure=True, **extra):
         path, subdomain, domain = get_path_and_subdomain(path)
         extra.update({
             'SERVER_NAME': str(domain),

@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, url
+from django.views.generic.base import TemplateView
 
 from nuntium.views import (
     HelpView,
@@ -23,4 +24,8 @@ urlpatterns = patterns('',
     url(r'^help/(?P<section_name>\w+)/?$', HelpView.as_view(), name='help_section'),
     url(r'^help/?$', HelpView.as_view()),
     url(r'^version.json', VersionView.as_view(), name="version"),
+    url(
+        r"^robots.txt",
+        TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
+    ),
 )
