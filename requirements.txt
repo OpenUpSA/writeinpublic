@@ -67,7 +67,7 @@ python-openid==2.2.5
 python-social-auth==0.2.21
 pytz==2016.4
 PyYAML==3.11
-requests==2.11.1
+requests==2.32.2
 requests-oauthlib==0.7.0
 sentry-sdk==0.14.3
 simplejson==3.8.2
