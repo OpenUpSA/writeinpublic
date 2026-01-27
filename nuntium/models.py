@@ -16,7 +16,6 @@ from django.conf import settings
 from subdomains.utils import reverse
 import uuid
 from django.template.defaultfilters import slugify
-import re
 from django.db.models import Q
 import requests
 from django.utils.timezone import now
@@ -200,26 +199,24 @@ class Message(models.Model):
             )
 
     def slugifyme(self):
-        if not slugify(unidecode(unicode(self.subject))):
+        base = slugify(unidecode(unicode(self.subject)))
+        if not base:
             self.subject = '-'
+            base = '-'
 
-        self.slug = slugify(unidecode(unicode(self.subject)))
-        #Previously created messages with the same slug
+        if not Message.objects.filter(slug=base).exists():
+            self.slug = base
+            return
 
-        regex = "^" + self.slug + "(-[0-9]*){0,1}$"
-        previously = Message.objects.filter(slug__regex=regex)
-        count = 1
-        for message in previously:
-            new_regex = "^" + self.slug + "-(\d+){0,1}$"
-            if re.match(new_regex, message.slug) is not None:
-                groups = re.match(new_regex, message.slug).groups()
-                if len(groups) > 0:
-                    if int(groups[0]) > count:
-                        count = int(groups[0])
+        prefix = base + '-'
+        max_suffix = 0
 
-        previously = previously.count()
-        if previously > 0:
-            self.slug = self.slug + '-' + str(count + 1)
+        for existing_slug in Message.objects.filter(slug__startswith=prefix).values_list('slug', flat=True):
+            tail = existing_slug[len(prefix):]
+            if tail.isdigit():
+                max_suffix = max(max_suffix, int(tail))
+
+        self.slug = prefix + str(max_suffix + 1)
 
     def veryfy_people(self):
         if not self.persons:
@@ -253,17 +250,16 @@ class Message(models.Model):
         self.create_outbound_messages()
 
     def set_to_ready(self):
-        for outbound_message in self.outbound_messages:
-            outbound_message.status = 'ready'
-            outbound_message.save()
+        NoContactOM.objects.filter(message=self).update(status='ready')
+        OutboundMessage.objects.filter(message=self).update(status='ready')
 
     def moderate(self):
         if not self.confirmated:
             raise ValidationError(_('The message needs '
                 + 'to be confirmated first'))
-        self.set_to_ready()
         if self.moderated:
             raise ValidationError(_('Cannot moderate an already moderated message'))
+        self.set_to_ready()
         # if we turn on moderation after some messages have been created then
         # they will not have associated Moderation objects so we need to catch
         # that, create the moderation object and then try again.
