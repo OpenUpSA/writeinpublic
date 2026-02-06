@@ -268,7 +268,7 @@ class Message(models.Model):
             self.moderation.success()
         except Moderation.DoesNotExist:
             if self.writeitinstance.config.moderation_needed_in_all_messages:
-                moderation, created = Moderation.objects.get_or_create(message=self)
+                moderation, created = Moderation.objects.create(message=self)
                 if created:
                     self.moderation.success()
                     return
