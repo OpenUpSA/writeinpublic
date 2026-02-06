@@ -14,6 +14,8 @@ from nuntium.forms import WriteItInstanceCreateFormPopitUrl
 
 class MembershipInline(admin.TabularInline):
     model = WriteItInstance.persons.through
+    raw_id_fields = ('person',)
+    extra = 0
 
 
 class NewAnswerNotificationTemplateAdmin(admin.TabularInline):

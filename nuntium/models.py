@@ -247,7 +247,8 @@ class Message(models.Model):
         super(Message, self).save(*args, **kwargs)
         if created and not self.public:
             self.create_moderation()
-        self.create_outbound_messages()
+        if created:
+            self.create_outbound_messages()
 
     def set_to_ready(self):
         NoContactOM.objects.filter(message=self).update(status='ready')
