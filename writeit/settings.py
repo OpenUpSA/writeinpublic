@@ -157,8 +157,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.static",
     "django.core.context_processors.tz",
     "django.contrib.messages.context_processors.messages",
-    "social.apps.django_app.context_processors.backends",
-    "social.apps.django_app.context_processors.login_redirect",
+    "social_django.context_processors.backends",
+    "social_django.context_processors.login_redirect",
     "writeit.context_processors.web_api_settings",
     "writeit.context_processors.google_analytics_settings",
 )
@@ -198,10 +198,11 @@ INSTALLED_APPS = (
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "social.apps.django_app.default",
+    "social_django",
     "annoying",
     "celery_haystack",
-    "djcelery",
+    "django_celery_beat",
+    "django_celery_results",
     "debug_toolbar",
     "instance",
     "nuntium",
@@ -406,7 +407,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env.str("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY", None)
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env.str("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET", None)
 
 AUTHENTICATION_BACKENDS = (
-    "social.backends.google.GoogleOAuth2",
+    "social_core.backends.google.GoogleOAuth2",
     "django.contrib.auth.backends.ModelBackend",
 )
 
