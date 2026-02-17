@@ -407,7 +407,7 @@ class AbstractOutboundMessage(models.Model):
 
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
     status = models.CharField(
-        max_length="10",
+        max_length=10,
         choices=STATUS_CHOICES,
         default="new",
         )

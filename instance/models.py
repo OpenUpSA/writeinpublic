@@ -421,12 +421,12 @@ class WriteitInstancePopitInstanceRecord(models.Model):
     writeitinstance = models.ForeignKey(WriteItInstance, on_delete=models.CASCADE)
     popolo_source = models.ForeignKey(PopoloSource, on_delete=models.CASCADE)
     periodicity = models.CharField(
-        max_length="2",
+        max_length=2,
         choices=PERIODICITY,
         default='1W',
         )
     status = models.CharField(
-        max_length="20",
+        max_length=20,
         choices=STATUS_CHOICES,
         default="nothing",
         )

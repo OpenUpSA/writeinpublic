@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contact',
             name='popolo_person',
-            field=models.ForeignKey(blank=True, to='popolo.Person', null=True),
+            field=models.ForeignKey(blank=True, to='popolo.Person', null=True, on_delete=models.SET_NULL),
             preserve_default=True,
         ),
     ]

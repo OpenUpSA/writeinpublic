@@ -50,25 +50,25 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='rawincomingemail',
             name='answer',
-            field=models.OneToOneField(related_name='raw_email', null=True, to='nuntium.Answer'),
+            field=models.OneToOneField(related_name='raw_email', null=True, to='nuntium.Answer', on_delete=models.SET_NULL),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='rawincomingemail',
             name='writeitinstance',
-            field=models.ForeignKey(related_name='raw_emails', to='instance.WriteItInstance', null=True),
+            field=models.ForeignKey(related_name='raw_emails', to='instance.WriteItInstance', null=True, on_delete=models.SET_NULL),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='mailittemplate',
             name='writeitinstance',
-            field=models.OneToOneField(related_name='mailit_template', to='instance.WriteItInstance'),
+            field=models.OneToOneField(related_name='mailit_template', to='instance.WriteItInstance', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='bouncedmessagerecord',
             name='outbound_message',
-            field=models.OneToOneField(to='nuntium.OutboundMessage'),
+            field=models.OneToOneField(to='nuntium.OutboundMessage', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

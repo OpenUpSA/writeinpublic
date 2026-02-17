@@ -15,4 +15,7 @@ def _compat_patterns(prefix, *args):
 
 django.conf.urls.patterns = _compat_patterns
 
-django.core.management.base.NoArgsCommand = django.core.management.base.BaseCommand
+class _NoArgsCommand(django.core.management.base.BaseCommand):
+    option_list = ()
+
+django.core.management.base.NoArgsCommand = _NoArgsCommand

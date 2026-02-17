@@ -2,7 +2,7 @@
 import re
 import pathlib
 
-packages = ['djangoplugins', 'popolo', 'popolo_sources', 'subdomains', 'popit']
+packages = ['djangoplugins', 'popolo', 'popolo_sources', 'subdomains', 'popit', 'pagination']
 
 
 def find_matching_paren(text, start):
@@ -48,6 +48,19 @@ def patch_subfieldbase(text):
     return text
 
 
+def patch_except_syntax(text):
+    """Fix Python 2 except syntax: 'except X, Y:' -> 'except (X, Y):' or 'except X as Y:'."""
+    def replace_except(m):
+        first = m.group(1)
+        second = m.group(2)
+        if second[0].isupper():
+            return f'except ({first}, {second}):'
+        else:
+            return f'except {first} as {second}:'
+    text = re.sub(r'except\s+(\w+),\s+(\w+):', replace_except, text)
+    return text
+
+
 def patch_django3_imports(text):
     """Replace removed Django 3 imports with their Python 3 equivalents."""
     replacements = [
@@ -69,18 +82,33 @@ def patch_django3_imports(text):
     return text
 
 
-for pkg_name in packages:
+import site
+
+def find_package_dir(pkg_name):
+    """Find a package directory by name, even if it can't be imported."""
     try:
         pkg = __import__(pkg_name)
-    except ImportError:
-        print(f"Skipping {pkg_name} (not installed)")
-        continue
+        return pathlib.Path(pkg.__file__).parent
+    except Exception:
+        pass
+    # Fallback: search site-packages directories
+    for sp in site.getsitepackages() + [site.getusersitepackages()]:
+        candidate = pathlib.Path(sp) / pkg_name
+        if candidate.is_dir():
+            return candidate
+    return None
 
-    pkg_dir = pathlib.Path(pkg.__file__).parent
+
+for pkg_name in packages:
+    pkg_dir = find_package_dir(pkg_name)
+    if pkg_dir is None:
+        print(f"Skipping {pkg_name} (not found)")
+        continue
     for py_file in pkg_dir.glob('**/*.py'):
         text = py_file.read_text()
         patched = patch_on_delete(text)
         patched = patch_subfieldbase(patched)
+        patched = patch_except_syntax(patched)
         patched = patch_django3_imports(patched)
         if patched != text:
             py_file.write_text(patched)

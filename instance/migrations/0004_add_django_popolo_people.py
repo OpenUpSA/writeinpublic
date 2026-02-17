@@ -5,7 +5,7 @@ import re
 from urllib.parse import urlsplit, urlunsplit
 
 from django.db import migrations
-from django.contrib.contenttypes.management import update_contenttypes
+from django.contrib.contenttypes.management import create_contenttypes as update_contenttypes
 
 
 def is_proxy_url(url):

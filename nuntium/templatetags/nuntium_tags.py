@@ -51,7 +51,7 @@ def localize_datetime(dt, language_code=None):
         return dt
 
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def assignment_url_with_subdomain(context, view, subdomain=UNSET, *args, **kwargs):
     return subdomainsurls(context, view, subdomain, *args, **kwargs)
 
