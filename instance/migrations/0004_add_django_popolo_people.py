@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 import re
-from urlparse import urlsplit, urlunsplit
+from urllib.parse import urlsplit, urlunsplit
 
 from django.db import migrations
 from django.contrib.contenttypes.management import update_contenttypes

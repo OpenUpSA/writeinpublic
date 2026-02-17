@@ -72,7 +72,7 @@ class UsingDbMixin(object):
         super(UsingDbMixin, self).tearDown(*args, **kwargs)
 
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 
 def get_path_and_subdomain(path, **extra):

@@ -1,5 +1,5 @@
 # coding=utf-8
-import urlparse
+import urllib.parse as urlparse
 
 from django.forms import ModelForm, ModelMultipleChoiceField, SelectMultiple, URLField, Form, Textarea, TextInput, EmailInput
 from contactos.models import Contact

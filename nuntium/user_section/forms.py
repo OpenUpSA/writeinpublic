@@ -1,5 +1,5 @@
 # coding=utf-8
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core import validators

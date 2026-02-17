@@ -9,7 +9,7 @@ from django.conf.global_settings import LANGUAGES
 from django.utils.translation import to_locale
 import environ
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 env = environ.Env()
 

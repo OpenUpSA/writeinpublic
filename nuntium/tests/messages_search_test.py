@@ -14,7 +14,7 @@ from ..views import MessageSearchView, PerInstanceSearchView
 from haystack.views import SearchView
 from popolo.models import Person
 import urllib
-import urlparse
+import urllib.parse as urlparse
 
 
 class MessagesSearchTestCase(TestCase):
