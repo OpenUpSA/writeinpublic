@@ -1,12 +1,9 @@
-FROM python:2.7
+FROM python:3.9.22-bookworm
 
 ENV PYTHONUNBUFFERED 1
 
 COPY pkglist /tmp/
-RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list \
-  && sed -i 's|security.debian.org|archive.debian.org|g' /etc/apt/sources.list \
-  && sed -i '/stretch-updates/d' /etc/apt/sources.list \
-  && apt-get update \
+RUN apt-get update \
   && apt-get install -y $(cat /tmp/pkglist) \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
@@ -15,6 +12,7 @@ RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list \
 # Copy, then install requirements before copying rest for a requirements cache layer.
 COPY requirements.txt /tmp/
 RUN cd /tmp \
+    && pip install --upgrade pip setuptools wheel \
     && pip install -r requirements.txt
 
 COPY . /app
