@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='writeitinstanceconfig',
             name='default_language',
-            field=models.CharField(max_length=10, choices=[(b'ar', b'Arabic'), (b'cs', b'Czech'), (b'en', b'English'), (b'es', b'Spanish'), (b'fa', b'Persian'), (b'fr', b'French'), (b'hu', b'Hungarian')]),
+            field=models.CharField(max_length=10, choices=[('ar', 'Arabic'), ('cs', 'Czech'), ('en', 'English'), ('es', 'Spanish'), ('fa', 'Persian'), ('fr', 'French'), ('hu', 'Hungarian')]),
             preserve_default=True,
         ),
     ]

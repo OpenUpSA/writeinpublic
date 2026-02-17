@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='writeitinstanceconfig',
             name='real_name_for_site_emails',
-            field=models.TextField(default=b'', help_text='The name that should appear in the From: line of emails sent from this site', blank=True),
+            field=models.TextField(default='', help_text='The name that should appear in the From: line of emails sent from this site', blank=True),
             preserve_default=True,
         ),
     ]

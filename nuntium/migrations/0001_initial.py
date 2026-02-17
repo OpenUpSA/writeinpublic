@@ -34,8 +34,8 @@ class Migration(migrations.Migration):
             name='AnswerAttachment',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('content', models.FileField(upload_to=b'attachments/%Y/%m/%d')),
-                ('name', models.CharField(default=b'', max_length=512)),
+                ('content', models.FileField(upload_to='attachments/%Y/%m/%d')),
+                ('name', models.CharField(default='', max_length=512)),
                 ('answer', models.ForeignKey(related_name='attachments', to='nuntium.Answer', on_delete=models.CASCADE)),
             ],
             options={
@@ -140,7 +140,7 @@ class Migration(migrations.Migration):
             name='NoContactOM',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('status', models.CharField(default=b'new', max_length=b'10', choices=[(b'new', 'Newly created'), (b'ready', 'Ready to send'), (b'sent', 'Sent'), (b'error', 'Error sending it'), (b'needmodera', 'Needs moderation')])),
+                ('status', models.CharField(default='new', max_length=10, choices=[('new', 'Newly created'), ('ready', 'Ready to send'), ('sent', 'Sent'), ('error', 'Error sending it'), ('needmodera', 'Needs moderation')])),
                 ('message', models.ForeignKey(to='nuntium.Message', on_delete=models.CASCADE)),
                 ('person', models.ForeignKey(to='popit.Person', on_delete=models.CASCADE)),
                 ('site', models.ForeignKey(to='sites.Site', on_delete=models.CASCADE)),
@@ -154,7 +154,7 @@ class Migration(migrations.Migration):
             name='OutboundMessage',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('status', models.CharField(default=b'new', max_length=b'10', choices=[(b'new', 'Newly created'), (b'ready', 'Ready to send'), (b'sent', 'Sent'), (b'error', 'Error sending it'), (b'needmodera', 'Needs moderation')])),
+                ('status', models.CharField(default='new', max_length=10, choices=[('new', 'Newly created'), ('ready', 'Ready to send'), ('sent', 'Sent'), ('error', 'Error sending it'), ('needmodera', 'Needs moderation')])),
                 ('contact', models.ForeignKey(to='contactos.Contact', on_delete=models.CASCADE)),
                 ('message', models.ForeignKey(to='nuntium.Message', on_delete=models.CASCADE)),
                 ('site', models.ForeignKey(to='sites.Site', on_delete=models.CASCADE)),

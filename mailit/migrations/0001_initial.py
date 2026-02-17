@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
             name='MailItTemplate',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('subject_template', models.CharField(default=b'{subject}', help_text='You can use {subject}, {content}, {person}, {author}, {site_url}, {site_name}, and {owner_email}', max_length=255)),
+                ('subject_template', models.CharField(default='{subject}', help_text='You can use {subject}, {content}, {person}, {author}, {site_url}, {site_name}, and {owner_email}', max_length=255)),
                 ('content_template', models.TextField(help_text='You can use {subject}, {content}, {person}, {author}, {site_url}, {site_name}, and {owner_email}', blank=True)),
                 ('content_html_template', models.TextField(help_text='You can use {subject}, {content}, {person}, {author}, {site_url}, {site_name}, and {owner_email}', blank=True)),
             ],
@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('content', models.TextField()),
                 ('problem', models.BooleanField(default=False)),
-                ('message_id', models.CharField(default=b'', max_length=2048)),
+                ('message_id', models.CharField(default='', max_length=2048)),
             ],
             options={
             },

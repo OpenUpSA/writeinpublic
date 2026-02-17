@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='message',
             name='author_name',
-            field=models.CharField(default=b'', max_length=512, blank=True),
+            field=models.CharField(default='', max_length=512, blank=True),
             preserve_default=True,
         ),
     ]
