@@ -34,7 +34,7 @@ django-pipeline==1.5.4
 django-plugins==0.3.0
 django-subdomains==2.0.4
 django-tastypie==0.13.3
-elasticsearch==7.17.27
+elasticsearch==7.17.13
 email-reply-parser==0.3.0
 enum34==1.1.6
 flufl.bounce==2.3
