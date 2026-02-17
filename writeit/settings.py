@@ -114,56 +114,63 @@ STATICFILES_FINDERS = (
 STATICFILES_STORAGE = (
     "pipeline.storage.NonPackagingPipelineStorage"
     if TESTING
-    else "pipeline.storage.PipelineCachedStorage"
+    else "pipeline.storage.PipelineManifestStorage"
 )
 
-PIPELINE_CSS_COMPRESSOR = "pipeline.compressors.yui.YUICompressor"
-PIPELINE_YUI_BINARY = "/usr/bin/env yui-compressor"
-PIPELINE_COMPILERS = ("pipeline.compilers.sass.SASSCompiler",)
-PIPELINE_SASS_BINARY = "/usr/bin/env sassc"  # Libsass, via libsass-python
-PIPELINE_CSS = {
-    "writeit-instance": {
-        "source_filenames": ("sass/instance.scss",),
-        "output_filename": "css/instance.css",
-    },
-    "writeit-admin": {
-        "source_filenames": ("sass/admin.scss",),
-        "output_filename": "css/admin.css",
-    },
-    "writeit-manager": {
-        "source_filenames": ("sass/manager.scss",),
-        "output_filename": "css/manager.css",
-    },
-    "writeit-writeinpublic": {
-        "source_filenames": ("sass/writeinpublic.scss",),
-        "output_filename": "css/writeinpublic.css",
+PIPELINE = {
+    "CSS_COMPRESSOR": "pipeline.compressors.yui.YUICompressor",
+    "YUI_BINARY": "/usr/bin/env yui-compressor",
+    "COMPILERS": ("pipeline.compilers.sass.SASSCompiler",),
+    "SASS_BINARY": "/usr/bin/env sassc",  # Libsass, via libsass-python
+    "STYLESHEETS": {
+        "writeit-instance": {
+            "source_filenames": ("sass/instance.scss",),
+            "output_filename": "css/instance.css",
+        },
+        "writeit-admin": {
+            "source_filenames": ("sass/admin.scss",),
+            "output_filename": "css/admin.css",
+        },
+        "writeit-manager": {
+            "source_filenames": ("sass/manager.scss",),
+            "output_filename": "css/manager.css",
+        },
+        "writeit-writeinpublic": {
+            "source_filenames": ("sass/writeinpublic.scss",),
+            "output_filename": "css/writeinpublic.css",
+        },
     },
 }
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    "writeit.template_loaders.SubdomainFilesystemLoader",
-    "django.template.loaders.filesystem.Loader",
-    "django.template.loaders.app_directories.Loader",
-    # 'django.template.loaders.eggs.Loader',
-)
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
+        "OPTIONS": {
+            "loaders": [
+                "writeit.template_loaders.SubdomainFilesystemLoader",
+                "django.template.loaders.filesystem.Loader",
+                "django.template.loaders.app_directories.Loader",
+            ],
+            "context_processors": [
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.debug",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.request",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
+                "django.contrib.messages.context_processors.messages",
+                "social_django.context_processors.backends",
+                "social_django.context_processors.login_redirect",
+                "writeit.context_processors.web_api_settings",
+                "writeit.context_processors.google_analytics_settings",
+            ],
+        },
+    },
+]
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.request",
-    "django.core.context_processors.static",
-    "django.core.context_processors.tz",
-    "django.contrib.messages.context_processors.messages",
-    "social_django.context_processors.backends",
-    "social_django.context_processors.login_redirect",
-    "writeit.context_processors.web_api_settings",
-    "writeit.context_processors.google_analytics_settings",
-)
-
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -189,7 +196,6 @@ SUBDOMAIN_URLCONFS = {
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = "writeit.wsgi.application"
 
-TEMPLATE_DIRS = (os.path.join(BASE_DIR, "templates"),)
 
 INSTALLED_APPS = (
     "django.contrib.auth",
