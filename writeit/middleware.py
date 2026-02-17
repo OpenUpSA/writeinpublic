@@ -1,6 +1,54 @@
+import re
 import threading
 
-class SubdomainInThreadLocalStorageMiddleware(object):
+from django.conf import settings
+from django.utils.cache import patch_vary_headers
+from django.utils.deprecation import MiddlewareMixin
+
+lower = lambda s: s.lower() if s else s
+
+
+class SubdomainURLRoutingMiddleware(MiddlewareMixin):
+    """Django 3 compatible replacement for subdomains.middleware.SubdomainURLRoutingMiddleware."""
+
+    def get_domain_for_request(self, request):
+        return lower(settings.SESSION_COOKIE_DOMAIN) or lower(request.get_host())
+
+    def process_request(self, request):
+        domain = self.get_domain_for_request(request)
+        host = lower(request.get_host())
+        pattern = r'^(?:(?P<subdomain>.*?)\.)?%s(?::.*)?$' % re.escape(domain)
+        matches = re.match(pattern, host)
+        if matches:
+            request.subdomain = matches.group('subdomain')
+        else:
+            request.subdomain = None
+
+        urlconf = None
+        if hasattr(settings, 'SUBDOMAIN_URLCONFS'):
+            urlconf = settings.SUBDOMAIN_URLCONFS.get(request.subdomain)
+        if urlconf is not None:
+            request.urlconf = urlconf
+
+    def process_response(self, request, response):
+        if getattr(settings, 'FORCE_VARY_ON_HOST', True):
+            patch_vary_headers(response, ('Host',))
+        return response
+
+
+class PaginationMiddleware(MiddlewareMixin):
+    """Django 3 compatible replacement for pagination.middleware.PaginationMiddleware."""
+
+    def process_request(self, request):
+        def get_page(suffix=''):
+            try:
+                return int(request.GET.get('page%s' % suffix, 1))
+            except (ValueError, TypeError):
+                return 1
+        request.page = get_page
+
+
+class SubdomainInThreadLocalStorageMiddleware(MiddlewareMixin):
 
     tls = threading.local()
 

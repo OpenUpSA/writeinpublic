@@ -176,11 +176,11 @@ MIDDLEWARE = (
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "subdomains.middleware.SubdomainURLRoutingMiddleware",
+    "writeit.middleware.SubdomainURLRoutingMiddleware",
     "writeit.middleware.SubdomainInThreadLocalStorageMiddleware",
     "nuntium.middleware.InstanceLocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "pagination.middleware.PaginationMiddleware",
+    "writeit.middleware.PaginationMiddleware",
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )

@@ -2,7 +2,7 @@
 import re
 import pathlib
 
-packages = ['djangoplugins', 'popolo', 'popolo_sources', 'subdomains', 'popit', 'pagination']
+packages = ['djangoplugins', 'popolo', 'popolo_sources', 'subdomains', 'popit', 'pagination', 'celery_haystack']
 
 
 def find_matching_paren(text, start):
@@ -61,6 +61,30 @@ def patch_except_syntax(text):
     return text
 
 
+def patch_old_style_middleware(text):
+    """Convert old-style middleware classes to use MiddlewareMixin for Django 2+ compatibility."""
+    if 'def process_request' not in text and 'def process_response' not in text:
+        return text
+    if 'MiddlewareMixin' in text:
+        return text
+    # Replace class Foo(object): with class Foo(MiddlewareMixin):
+    text = re.sub(
+        r'(class\s+\w+Middleware)\(object\)',
+        r'\1(MiddlewareMixin)',
+        text,
+    )
+    # Add the import if we made a substitution
+    if 'MiddlewareMixin' in text and 'from django.utils.deprecation import MiddlewareMixin' not in text:
+        text = 'from django.utils.deprecation import MiddlewareMixin\n' + text
+    return text
+
+
+def patch_celery5_imports(text):
+    """Fix celery imports removed in Celery 5."""
+    text = text.replace('from celery.task import Task', 'from celery import Task')
+    return text
+
+
 def patch_django3_imports(text):
     """Replace removed Django 3 imports with their Python 3 equivalents."""
     replacements = [
@@ -110,6 +134,8 @@ for pkg_name in packages:
         patched = patch_subfieldbase(patched)
         patched = patch_except_syntax(patched)
         patched = patch_django3_imports(patched)
+        patched = patch_celery5_imports(patched)
+        patched = patch_old_style_middleware(patched)
         if patched != text:
             py_file.write_text(patched)
             print(f"Patched: {py_file}")
