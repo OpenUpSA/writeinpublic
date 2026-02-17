@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.views.generic import TemplateView
 
 from .views import (
@@ -7,7 +7,7 @@ from .views import (
     WriteItInstanceCreateView,
     )
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^accounts/profile/?$', UserAccountView.as_view(), name='account'),
     url(r'^accounts/your_instances/?$', YourInstancesView.as_view(), name='your-instances'),
 
@@ -18,4 +18,4 @@ urlpatterns = patterns('',
     url(r'^docs/?$',
         TemplateView.as_view(template_name="nuntium/profiles/docs.html"),
         name='user_section_documentation'),
-)
+]

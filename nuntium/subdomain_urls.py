@@ -1,6 +1,8 @@
 from django.conf import settings
-from django.conf.urls import patterns, url, include
+from django.conf.urls import url, include
 from django.conf.urls.i18n import i18n_patterns
+from django.contrib.auth.views import LogoutView
+from django.views.i18n import JavaScriptCatalog
 
 from django_downloadview import ObjectDownloadView
 
@@ -63,7 +65,7 @@ from nuntium.user_section.stats import StatsView
 # admin.autodiscover()
 download_attachment_view = ObjectDownloadView.as_view(model=AnswerAttachment, file_field="content")
 
-managepatterns = patterns('',
+managepatterns = [
     url(r'^$', WriteItInstanceUpdateView.as_view(), name='writeitinstance_basic_update'),
     url(r'^settings/moderation/$', WriteItInstanceModerationView.as_view(), name='writeitinstance_moderation_update'),
     url(r'^moderationqueue/$', ModerationQueue.as_view(), name='writeitinstance_moderation_queue'),
@@ -101,8 +103,7 @@ managepatterns = patterns('',
     url(r'^moderation_accept/(?P<slug>[-\w]+)/?$', AcceptModerationView.as_view(), name='moderation_accept'),
     url(r'^moderation_reject/(?P<slug>[-\w]+)/?$', RejectModerationView.as_view(), name='moderation_rejected'),
     url(r'^welcome/$', WelcomeView.as_view(), name='welcome'),
-
-)
+]
 
 js_info_dict = {
     'packages': ('nuntium',),
@@ -110,9 +111,9 @@ js_info_dict = {
 
 write_message_wizard = WriteMessageView.as_view(url_name='write_message_step')
 
-urlpatterns = i18n_patterns('',
+urlpatterns = i18n_patterns(
     url(r'^$', WriteItInstanceDetailView.as_view(), name='instance_detail'),
-    url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+    url(r'^jsi18n/$', JavaScriptCatalog.as_view(**js_info_dict), name='javascript-catalog'),
     url(r'^write/sign/(?P<slug>[-\w]+)/$', ConfirmView.as_view(), name='confirm'),
     url(r'^write/sign/$', WriteSignView.as_view(), name='write_message_sign'),
     url(r'^write/(?P<step>.+)/$', write_message_wizard, name='write_message_step'),
@@ -130,7 +131,7 @@ urlpatterns = i18n_patterns('',
     url(r'^search/$', PerInstanceSearchView(), name='instance_search'),
     url(r'^attachment/(?P<pk>[-\d]+)/$', download_attachment_view, name='attachment'),
     url(r'^manage/', include(managepatterns)),
-    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', kwargs={'next_page': '/'}, name='logout'),
+    url(r'^accounts/logout/$', LogoutView.as_view(next_page='/'), name='logout'),
 
     url(r'^about/?$', AboutView.as_view(), name='about'),
 
@@ -141,6 +142,6 @@ urlpatterns = i18n_patterns('',
 
 if settings.DEBUG:
     import debug_toolbar
-    urlpatterns += patterns('',
+    urlpatterns += [
         url(r'^__debug__/', include(debug_toolbar.urls)),
-    )
+    ]

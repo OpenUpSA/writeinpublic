@@ -18,7 +18,7 @@ except ImportError:
     from email.Parser import Parser
 import re
 
-from django.utils.six import BytesIO, text_type as str
+from io import BytesIO
 
 
 class UnsupportedMailFormat(Exception):
