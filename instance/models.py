@@ -25,7 +25,7 @@ from requests.exceptions import ConnectionError
 from subdomains.utils import reverse
 
 from contactos.models import Contact
-from mailit import MailChannel
+from mailit.channel import MailChannel
 logger = logging.getLogger(__name__)
 
 

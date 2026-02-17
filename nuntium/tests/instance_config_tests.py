@@ -4,7 +4,7 @@ from instance.models import InstanceMembership, PopoloPerson, WriteItInstance, W
 from popolo_sources.models import PopoloSource
 from nuntium.models import Message
 from django.contrib.auth.models import User
-from mailit import MailChannel
+from mailit.channel import MailChannel
 from contactos.models import Contact
 from django.core import mail
 

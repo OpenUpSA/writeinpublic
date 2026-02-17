@@ -1,7 +1,7 @@
 from django.forms import ModelForm
 from django.forms.models import ModelChoiceField
 from contactos.models import Contact
-from mailit import MailChannel
+from mailit.channel import MailChannel
 
 
 class ContactUpdateForm(ModelForm):
