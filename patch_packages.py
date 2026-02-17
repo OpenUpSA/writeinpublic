@@ -2,7 +2,7 @@
 import re
 import pathlib
 
-packages = ['djangoplugins', 'popolo', 'popolo_sources', 'subdomains']
+packages = ['djangoplugins', 'popolo', 'popolo_sources', 'subdomains', 'popit']
 
 
 def find_matching_paren(text, start):
@@ -42,6 +42,12 @@ def patch_on_delete(text):
     return result
 
 
+def patch_subfieldbase(text):
+    """Remove __metaclass__ = models.SubfieldBase (removed in Django 2.0)."""
+    text = re.sub(r'\s*__metaclass__\s*=\s*models\.SubfieldBase\n', '\n', text)
+    return text
+
+
 def patch_django3_imports(text):
     """Replace removed Django 3 imports with their Python 3 equivalents."""
     replacements = [
@@ -74,6 +80,7 @@ for pkg_name in packages:
     for py_file in pkg_dir.glob('**/*.py'):
         text = py_file.read_text()
         patched = patch_on_delete(text)
+        patched = patch_subfieldbase(patched)
         patched = patch_django3_imports(patched)
         if patched != text:
             py_file.write_text(patched)
