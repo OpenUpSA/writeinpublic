@@ -23,6 +23,7 @@ WORKDIR /app
 RUN DATABASE_URL=sqlite:///tmp/dummy.db \
     ELASTICSEARCH_URL=http://localhost:9200 \
     ELASTICSEARCH_INDEX=dummy \
+    DJANGO_SECRET_KEY=dummy-build-key \
     python manage.py compilemessages
 
 RUN addgroup --system django \
