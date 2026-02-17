@@ -447,7 +447,7 @@ class WriteitInstancePopitInstanceRecord(models.Model):
 
 
 class WriteItInstanceConfig(models.Model):
-    writeitinstance = AutoOneToOneField(WriteItInstance, related_name='config')
+    writeitinstance = AutoOneToOneField(WriteItInstance, related_name='config', on_delete=models.CASCADE)
     testing_mode = models.BooleanField(default=True)
     moderation_needed_in_all_messages = models.BooleanField(
         help_text=_("Every message is going to \
