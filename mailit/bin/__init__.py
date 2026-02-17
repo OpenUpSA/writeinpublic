@@ -1,1 +1,1 @@
-from handleemail import *  # noqa
+from .handleemail import *  # noqa

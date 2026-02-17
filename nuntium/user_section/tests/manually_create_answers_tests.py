@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 from ..forms import AnswerForm
 from popolo.models import Person
-from user_section_views_tests import UserSectionTestCase
+from .user_section_views_tests import UserSectionTestCase
 
 
 class ManuallyCreateAnswersTestCase(UserSectionTestCase):
