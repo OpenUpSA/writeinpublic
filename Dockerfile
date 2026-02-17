@@ -19,7 +19,10 @@ COPY . /app
 
 WORKDIR /app
 
-RUN python manage.py compilemessages
+RUN DATABASE_URL=sqlite:///tmp/dummy.db \
+    ELASTICSEARCH_URL=http://localhost:9200 \
+    ELASTICSEARCH_INDEX=dummy \
+    python manage.py compilemessages
 
 RUN addgroup --system django \
     && adduser --system --ingroup django django \
