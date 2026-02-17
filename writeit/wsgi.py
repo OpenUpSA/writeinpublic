@@ -14,6 +14,7 @@ framework.
 
 """
 import os
+import writeit.compat  # noqa: F401 - patches django.utils.six for django-plugins
 
 # We defer to a DJANGO_SETTINGS_MODULE already in the environment. This breaks
 # if running multiple sites in the same mod_wsgi process. To fix this, use
