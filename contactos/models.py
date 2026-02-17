@@ -20,12 +20,12 @@ class ContactType(models.Model):
 
 class Contact(models.Model):
     """docstring for Contact"""
-    contact_type = models.ForeignKey('ContactType')
-    person = models.ForeignKey(Person)
+    contact_type = models.ForeignKey('ContactType', on_delete=models.CASCADE)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
     value = models.CharField(max_length=512)
     is_bounced = models.BooleanField(default=False)
-    owner = models.ForeignKey(User, related_name="contacts", null=True)
-    writeitinstance = models.ForeignKey('instance.WriteItInstance', related_name="contacts", null=True)
+    owner = models.ForeignKey(User, related_name="contacts", null=True, on_delete=models.SET_NULL)
+    writeitinstance = models.ForeignKey('instance.WriteItInstance', related_name="contacts", null=True, on_delete=models.SET_NULL)
     enabled = models.BooleanField(default=True)
 
     def __unicode__(self):

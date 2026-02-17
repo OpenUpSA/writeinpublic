@@ -10,10 +10,11 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 # Copy, then install requirements before copying rest for a requirements cache layer.
-COPY requirements.txt /tmp/
+COPY requirements.txt patch_packages.py /tmp/
 RUN cd /tmp \
-    && pip install --upgrade pip setuptools wheel \
-    && pip install -r requirements.txt
+    && pip install --upgrade pip "setuptools<71" wheel \
+    && pip install -r requirements.txt \
+    && python /tmp/patch_packages.py
 
 COPY . /app
 

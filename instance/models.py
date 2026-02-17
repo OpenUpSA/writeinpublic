@@ -255,7 +255,7 @@ class WriteItInstance(models.Model):
     persons = models.ManyToManyField(PopoloPerson,
         related_name='writeit_instances',
         through='InstanceMembership')
-    owner = models.ForeignKey(User, related_name="writeitinstances")
+    owner = models.ForeignKey(User, related_name="writeitinstances", on_delete=models.CASCADE)
 
     def add_person(self, person):
         """Ensure there's exactly one link between the instance and a person"""
@@ -384,8 +384,8 @@ class WriteItInstance(models.Model):
 
 
 class InstanceMembership(models.Model):
-    person = models.ForeignKey(PopoloPerson)
-    writeitinstance = models.ForeignKey(WriteItInstance)
+    person = models.ForeignKey(PopoloPerson, on_delete=models.CASCADE)
+    writeitinstance = models.ForeignKey(WriteItInstance, on_delete=models.CASCADE)
 
 
 def new_write_it_instance(sender, instance, created, **kwargs):
@@ -418,8 +418,8 @@ class WriteitInstancePopitInstanceRecord(models.Model):
         ("waiting", _("Waiting")),
         ("inprogress", _("In Progress")),
         )
-    writeitinstance = models.ForeignKey(WriteItInstance)
-    popolo_source = models.ForeignKey(PopoloSource)
+    writeitinstance = models.ForeignKey(WriteItInstance, on_delete=models.CASCADE)
+    popolo_source = models.ForeignKey(PopoloSource, on_delete=models.CASCADE)
     periodicity = models.CharField(
         max_length="2",
         choices=PERIODICITY,
