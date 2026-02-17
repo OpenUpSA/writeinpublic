@@ -319,12 +319,12 @@ class WriteItInstance(models.Model):
                 Contact.objects.filter(
                     writeitinstance=self,
                     person=person).update(enabled=False)
-        except ConnectionError, e:
+        except ConnectionError as e:
             self.do_something_with_a_vanished_popit_api_instance(popolo_source)
             logger.exception("We could not connect with the URL")
             e.message = _('We could not connect with the URL')
             return (False, e)
-        except Exception, e:
+        except Exception as e:
             self.do_something_with_a_vanished_popit_api_instance(popolo_source)
             logger.exception("Unexpected error relating persons with popolo JSON")
             return (False, e)

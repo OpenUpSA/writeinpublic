@@ -75,11 +75,11 @@ class MailChannel(OutputPlugin):
                 text_content = template.get_content_template().format(**context)
                 html_content = template.content_html_template.format(**escape_dictionary_values(context))
                 subject = template.subject_template.format(**context)
-            except KeyError, error:
+            except KeyError as error:
                 log = "Error with templates for instance %(instance)s and the error was '%(error)s'"
                 log = log % {
                     'instance': writeitinstance.name,
-                    'error': error.__unicode__()
+                    'error': str(error)
                     }
                 mail_admins("Problem sending an email", log)
                 logging.info(log)
@@ -118,22 +118,22 @@ class MailChannel(OutputPlugin):
                 'to': outbound_message.contact.value,
                 }
             logging.info(log)
-        except SMTPServerDisconnected, e:
+        except SMTPServerDisconnected as e:
             logging.warning(e)
             return False, False
-        except SMTPResponseException, e:
+        except SMTPResponseException as e:
             logging.warning(e)
             if e.smtp_code == 552:
                 return False, False
             return False, True
 
-        except Exception, e:
+        except Exception as e:
             log = "Error with outbound id %(outbound_id)i, contact '%(contact)s' and message '%(message)s' and the error was '%(error)s'"
             log = log % {
                 'outbound_id': outbound_message.id,
                 'contact': outbound_message.contact.value,
                 'message': outbound_message.message,
-                'error': e.__unicode__()
+                'error': str(e)
                 }
             mail_admins("Problem sending an email", log)
             logging.info(log)

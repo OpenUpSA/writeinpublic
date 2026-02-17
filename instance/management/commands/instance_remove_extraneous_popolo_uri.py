@@ -19,7 +19,7 @@ class Command(BaseCommand):
             if original_count == 0:
                 msg = "There were no popolo_uri Identifier objects for person " \
                       "{person} with ID {person_id}"
-                print msg.format(person=person, person_id=person.id)
+                print(msg.format(person=person, person_id=person.id))
                 errors_found = True
                 continue
             if original_count == 1:
@@ -28,10 +28,10 @@ class Command(BaseCommand):
                     msg = "The only remaining popolo_uri Identifier for " \
                           "person {person} with ID {person_id} was a " \
                           "malformed legacy identifier: {bad_identifier}"
-                    print msg.format(
+                    print(msg.format(
                         person=person,
                         person_id=person.id,
-                        bad_identifier=sole_identifier.identifier)
+                        bad_identifier=sole_identifier.identifier))
                     errors_found = True
                     continue
             # Otherwise we have more than one identifier. Delete any
@@ -43,9 +43,9 @@ class Command(BaseCommand):
             if len(unique_remaining) > 1:
                 msg = "There were multiple conflicting IDs for person " \
                       "{person} with ID {person_id}"
-                print msg.format(person=person, person_id=person.id)
+                print(msg.format(person=person, person_id=person.id))
                 for non_unique_id in sorted(unique_remaining):
-                    print " ", non_unique_id
+                    print(" ", non_unique_id)
                 errors_found = True
                 continue
             # Now remove all but one of the identifiers:
