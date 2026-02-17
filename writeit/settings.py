@@ -243,7 +243,7 @@ ELASTICSEARCH_INDEX = env.str("ELASTICSEARCH_INDEX")
 
 HAYSTACK_CONNECTIONS = {
     "default": {
-        "ENGINE": "haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine",
+        "ENGINE": "haystack.backends.elasticsearch7_backend.Elasticsearch7SearchEngine",
         "URL": ELASTICSEARCH_URL,
         "PORT": urlparse(os.environ.get("ELASTICSEARCH_URL")).port,
         "INDEX_NAME": ELASTICSEARCH_INDEX,

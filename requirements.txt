@@ -23,7 +23,7 @@ django-dirtyfields==1.0
 django-downloadview==1.6
 django-extensions==1.6.7
 django-formtools==1.0
-django-haystack==2.4.0
+django-haystack==3.2.1
 django-jsonfield==1.4.1
 django-markdown-deux==1.0.5
 django-model-utils==3.1.2
@@ -34,7 +34,7 @@ django-pipeline==1.5.4
 django-plugins==0.3.0
 django-subdomains==2.0.4
 django-tastypie==0.13.3
-elasticsearch==1.6.0
+elasticsearch==7.17.27
 email-reply-parser==0.3.0
 enum34==1.1.6
 flufl.bounce==2.3

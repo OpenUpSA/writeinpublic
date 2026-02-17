@@ -74,11 +74,12 @@ services:
       - db-data:/var/lib/postgresql/data
 
   elasticsearch:
-    image: elasticsearch:1
+    image: elasticsearch:7.17.27
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     environment:
-      - ES_MAX_MEM=1g
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx1g
     ports:
       - 9200
 
