@@ -361,7 +361,7 @@ CELERY_BROKER_URL = env.str("CELERY_BROKER_URL", "amqp://guest:guest@rabbitmq//"
 BROKER_URL = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ["pickle"]
 CELERY_TASK_SERIALIZER = "pickle"
-CELERY_RESULT_BACKEND = "djcelery.backends.database:DatabaseBackend"
+CELERY_RESULT_BACKEND = "django-db"
 
 
 from celery.schedules import crontab
