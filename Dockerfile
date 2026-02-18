@@ -2,9 +2,12 @@ FROM python:2.7
 
 ENV PYTHONUNBUFFERED 1
 
+RUN echo "deb http://archive.debian.org/debian buster main" > /etc/apt/sources.list \
+  && echo "deb http://archive.debian.org/debian-security buster/updates main" >> /etc/apt/sources.list
+
 COPY pkglist /tmp/
 RUN apt-get update \
-  && apt-get install -y $(cat /tmp/pkglist) \
+  && apt-get install -y --no-install-recommends $(cat /tmp/pkglist) \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
