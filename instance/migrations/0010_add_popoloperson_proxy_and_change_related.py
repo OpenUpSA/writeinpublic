@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='instancemembership',
             name='person',
-            field=models.ForeignKey(to='instance.PopoloPerson'),
+            field=models.ForeignKey(to='instance.PopoloPerson', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterField(

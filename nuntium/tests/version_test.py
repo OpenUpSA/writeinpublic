@@ -20,8 +20,8 @@ class VersionTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
 
         data = json.loads(response.content)
-        self.assertTrue(data.has_key('git_version'))
-        self.assertFalse(data.has_key('message_count'))
+        self.assertIn('git_version', data)
+        self.assertNotIn('message_count', data)
 
     def test_check_instance_version_output(self):
         url = reverse('instance_version',
@@ -31,8 +31,8 @@ class VersionTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
 
         data = json.loads(response.content)
-        self.assertTrue(data.has_key('git_version'))
-        self.assertTrue(data.has_key('message_count'))
+        self.assertIn('git_version', data)
+        self.assertIn('message_count', data)
 
         self.assertEquals(data['message_count'], 1)
         self.assertEquals(data['answer_count'], 1)

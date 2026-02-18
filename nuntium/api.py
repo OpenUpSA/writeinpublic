@@ -264,7 +264,7 @@ class MessageResource(ModelResource):
             # Validating author_email
             try:
                 validate_email(bundle.data['author_email'])
-            except ValidationError, e:
+            except ValidationError as e:
                 raise ImmediateHttpResponse(response=HttpResponseBadRequest(e.__str__()))
 
         if bundle.data['persons'] == 'all':

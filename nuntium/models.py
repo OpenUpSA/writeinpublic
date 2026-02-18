@@ -49,7 +49,7 @@ def template_with_wrap(template, context):
 class MessageRecord(models.Model):
     status = models.CharField(max_length=255)
     datetime = models.DateField(default=now)
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -107,7 +107,7 @@ class Message(models.Model):
     author_email = models.EmailField()
     subject = models.CharField(max_length=255)
     content = models.TextField()
-    writeitinstance = models.ForeignKey(WriteItInstance)
+    writeitinstance = models.ForeignKey(WriteItInstance, on_delete=models.CASCADE)
     confirmated = models.BooleanField(default=False)
     slug = models.SlugField(max_length=255, unique=True)
     public = models.BooleanField(default=True)
@@ -293,8 +293,8 @@ pre_save.connect(slugify_message, sender=Message)
 class Answer(models.Model):
     content = models.TextField()
     content_html = models.TextField()
-    person = models.ForeignKey(PopoloPerson)
-    message = models.ForeignKey(Message, related_name='answers')
+    person = models.ForeignKey(PopoloPerson, on_delete=models.CASCADE)
+    message = models.ForeignKey(Message, related_name='answers', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now=True, null=True)
 
     def save(self, *args, **kwargs):
@@ -385,7 +385,7 @@ post_save.connect(send_new_answer_payload, sender=Answer)
 
 
 class AnswerAttachment(models.Model):
-    answer = models.ForeignKey(Answer, related_name="attachments")
+    answer = models.ForeignKey(Answer, related_name="attachments", on_delete=models.CASCADE)
     content = models.FileField(upload_to="attachments/%Y/%m/%d")
     name = models.CharField(max_length=512, default="")
 
@@ -405,20 +405,20 @@ class AbstractOutboundMessage(models.Model):
         ("needmodera", _("Needs moderation")),
         )
 
-    message = models.ForeignKey(Message)
+    message = models.ForeignKey(Message, on_delete=models.CASCADE)
     status = models.CharField(
-        max_length="10",
+        max_length=10,
         choices=STATUS_CHOICES,
         default="new",
         )
-    site = models.ForeignKey(Site)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     class Meta:
         abstract = True
 
 
 class NoContactOM(AbstractOutboundMessage):
-    person = models.ForeignKey(PopoloPerson)
+    person = models.ForeignKey(PopoloPerson, on_delete=models.CASCADE)
 
 
 # This will happen everytime a contact is created
@@ -459,7 +459,7 @@ class OutboundMessage(AbstractOutboundMessage):
     the one that will be tracked in order \
     to know the actual status of the message"""
 
-    contact = models.ForeignKey(Contact)
+    contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
 
     objects = OutboundMessageManager()
 
@@ -519,7 +519,7 @@ class OutboundMessage(AbstractOutboundMessage):
 
 
 class OutboundMessageIdentifier(models.Model):
-    outbound_message = models.OneToOneField(OutboundMessage)
+    outbound_message = models.OneToOneField(OutboundMessage, on_delete=models.CASCADE)
     key = models.CharField(max_length=255)
 
     @classmethod
@@ -553,8 +553,8 @@ post_save.connect(create_a_message_record, sender=OutboundMessage)
 
 
 class OutboundMessagePluginRecord(models.Model):
-    outbound_message = models.ForeignKey(OutboundMessage)
-    plugin = models.ForeignKey(Plugin)
+    outbound_message = models.ForeignKey(OutboundMessage, on_delete=models.CASCADE)
+    plugin = models.ForeignKey(Plugin, on_delete=models.CASCADE)
     sent = models.BooleanField(default=False)
     number_of_attempts = models.PositiveIntegerField(default=0)
     try_again = models.BooleanField(default=True)
@@ -565,7 +565,7 @@ default_confirmation_template_subject = read_template_as_string('templates/nunti
 
 
 class ConfirmationTemplate(models.Model):
-    writeitinstance = models.OneToOneField(WriteItInstance)
+    writeitinstance = models.OneToOneField(WriteItInstance, on_delete=models.CASCADE)
     content_html = models.TextField(
         blank=True,
         help_text=_('You can use {author_name}, {site_name}, {subject}, {content}, {recipients}, {confirmation_url}, and {message_url}'),
@@ -588,7 +588,7 @@ class ConfirmationTemplate(models.Model):
 
 
 class Confirmation(models.Model):
-    message = models.OneToOneField(Message)
+    message = models.OneToOneField(Message, on_delete=models.CASCADE)
     key = models.CharField(max_length=64, unique=True)
     created = models.DateField(default=now)
     confirmated_at = models.DateField(default=None, null=True)
@@ -673,7 +673,7 @@ post_save.connect(send_confirmation_email, sender=Confirmation)
 
 
 class Moderation(models.Model):
-    message = models.OneToOneField(Message, related_name='moderation')
+    message = models.OneToOneField(Message, related_name='moderation', on_delete=models.CASCADE)
     key = models.CharField(max_length=256)
 
     def save(self, *args, **kwargs):
@@ -706,6 +706,7 @@ class AnswerWebHook(models.Model):
     writeitinstance = models.ForeignKey(
         WriteItInstance,
         related_name='answer_webhooks',
+        on_delete=models.CASCADE,
         )
 
     def __unicode__(self):
@@ -716,7 +717,7 @@ class AnswerWebHook(models.Model):
 
 
 class Subscriber(models.Model):
-    message = models.ForeignKey(Message, related_name='subscribers')
+    message = models.ForeignKey(Message, related_name='subscribers', on_delete=models.CASCADE)
     email = models.EmailField()
 
 
@@ -728,6 +729,7 @@ class NewAnswerNotificationTemplate(models.Model):
     writeitinstance = models.OneToOneField(
         WriteItInstance,
         related_name='new_answer_notification_template',
+        on_delete=models.CASCADE,
         )
     template_html = models.TextField(
         blank=True,
@@ -754,7 +756,7 @@ class NewAnswerNotificationTemplate(models.Model):
 
 
 class RateLimiter(models.Model):
-    writeitinstance = models.ForeignKey(WriteItInstance)
+    writeitinstance = models.ForeignKey(WriteItInstance, on_delete=models.CASCADE)
     email = models.EmailField()
     day = models.DateField()
     count = models.PositiveIntegerField(default=1)

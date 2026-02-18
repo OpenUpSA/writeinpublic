@@ -5,7 +5,7 @@ from subdomains.utils import reverse
 from ..models import Answer, Message
 from haystack import indexes
 import urllib
-import urlparse
+import urllib.parse as urlparse
 
 
 class AnswerIndexTestCase(TestCase):

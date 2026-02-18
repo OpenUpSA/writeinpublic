@@ -1,4 +1,4 @@
-FROM python:2.7
+FROM python:3.9.22-bookworm
 
 ENV PYTHONUNBUFFERED 1
 
@@ -10,15 +10,21 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 # Copy, then install requirements before copying rest for a requirements cache layer.
-COPY requirements.txt /tmp/
+COPY requirements.txt patch_packages.py /tmp/
 RUN cd /tmp \
-    && pip install -r requirements.txt
+    && pip install --upgrade pip "setuptools<71" wheel \
+    && pip install -r requirements.txt \
+    && python /tmp/patch_packages.py
 
 COPY . /app
 
 WORKDIR /app
 
-RUN python manage.py compilemessages
+RUN DATABASE_URL=sqlite:///tmp/dummy.db \
+    ELASTICSEARCH_URL=http://localhost:9200 \
+    ELASTICSEARCH_INDEX=dummy \
+    DJANGO_SECRET_KEY=dummy-build-key \
+    python manage.py compilemessages
 
 RUN addgroup --system django \
     && adduser --system --ingroup django django \

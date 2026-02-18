@@ -9,7 +9,7 @@ from django.conf.global_settings import LANGUAGES
 from django.utils.translation import to_locale
 import environ
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 env = environ.Env()
 
@@ -114,66 +114,73 @@ STATICFILES_FINDERS = (
 STATICFILES_STORAGE = (
     "pipeline.storage.NonPackagingPipelineStorage"
     if TESTING
-    else "pipeline.storage.PipelineCachedStorage"
+    else "pipeline.storage.PipelineManifestStorage"
 )
 
-PIPELINE_CSS_COMPRESSOR = "pipeline.compressors.yui.YUICompressor"
-PIPELINE_YUI_BINARY = "/usr/bin/env yui-compressor"
-PIPELINE_COMPILERS = ("pipeline.compilers.sass.SASSCompiler",)
-PIPELINE_SASS_BINARY = "/usr/bin/env sassc"  # Libsass, via libsass-python
-PIPELINE_CSS = {
-    "writeit-instance": {
-        "source_filenames": ("sass/instance.scss",),
-        "output_filename": "css/instance.css",
-    },
-    "writeit-admin": {
-        "source_filenames": ("sass/admin.scss",),
-        "output_filename": "css/admin.css",
-    },
-    "writeit-manager": {
-        "source_filenames": ("sass/manager.scss",),
-        "output_filename": "css/manager.css",
-    },
-    "writeit-writeinpublic": {
-        "source_filenames": ("sass/writeinpublic.scss",),
-        "output_filename": "css/writeinpublic.css",
+PIPELINE = {
+    "CSS_COMPRESSOR": "pipeline.compressors.yui.YUICompressor",
+    "YUI_BINARY": "/usr/bin/env yui-compressor",
+    "COMPILERS": ("pipeline.compilers.sass.SASSCompiler",),
+    "SASS_BINARY": "/usr/bin/env sassc",  # Libsass, via libsass-python
+    "STYLESHEETS": {
+        "writeit-instance": {
+            "source_filenames": ("sass/instance.scss",),
+            "output_filename": "css/instance.css",
+        },
+        "writeit-admin": {
+            "source_filenames": ("sass/admin.scss",),
+            "output_filename": "css/admin.css",
+        },
+        "writeit-manager": {
+            "source_filenames": ("sass/manager.scss",),
+            "output_filename": "css/manager.css",
+        },
+        "writeit-writeinpublic": {
+            "source_filenames": ("sass/writeinpublic.scss",),
+            "output_filename": "css/writeinpublic.css",
+        },
     },
 }
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    "writeit.template_loaders.SubdomainFilesystemLoader",
-    "django.template.loaders.filesystem.Loader",
-    "django.template.loaders.app_directories.Loader",
-    # 'django.template.loaders.eggs.Loader',
-)
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
+        "OPTIONS": {
+            "loaders": [
+                "writeit.template_loaders.SubdomainFilesystemLoader",
+                "django.template.loaders.filesystem.Loader",
+                "django.template.loaders.app_directories.Loader",
+            ],
+            "context_processors": [
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.debug",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.request",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
+                "django.contrib.messages.context_processors.messages",
+                "social_django.context_processors.backends",
+                "social_django.context_processors.login_redirect",
+                "writeit.context_processors.web_api_settings",
+                "writeit.context_processors.google_analytics_settings",
+            ],
+        },
+    },
+]
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.request",
-    "django.core.context_processors.static",
-    "django.core.context_processors.tz",
-    "django.contrib.messages.context_processors.messages",
-    "social.apps.django_app.context_processors.backends",
-    "social.apps.django_app.context_processors.login_redirect",
-    "writeit.context_processors.web_api_settings",
-    "writeit.context_processors.google_analytics_settings",
-)
-
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "subdomains.middleware.SubdomainURLRoutingMiddleware",
+    "writeit.middleware.SubdomainURLRoutingMiddleware",
     "writeit.middleware.SubdomainInThreadLocalStorageMiddleware",
     "nuntium.middleware.InstanceLocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "pagination.middleware.PaginationMiddleware",
+    "writeit.middleware.PaginationMiddleware",
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -189,7 +196,6 @@ SUBDOMAIN_URLCONFS = {
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = "writeit.wsgi.application"
 
-TEMPLATE_DIRS = (os.path.join(BASE_DIR, "templates"),)
 
 INSTALLED_APPS = (
     "django.contrib.auth",
@@ -198,10 +204,11 @@ INSTALLED_APPS = (
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "social.apps.django_app.default",
+    "social_django",
     "annoying",
     "celery_haystack",
-    "djcelery",
+    "django_celery_beat",
+    "django_celery_results",
     "debug_toolbar",
     "instance",
     "nuntium",
@@ -243,7 +250,7 @@ ELASTICSEARCH_INDEX = env.str("ELASTICSEARCH_INDEX")
 
 HAYSTACK_CONNECTIONS = {
     "default": {
-        "ENGINE": "haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine",
+        "ENGINE": "haystack.backends.elasticsearch7_backend.Elasticsearch7SearchEngine",
         "URL": ELASTICSEARCH_URL,
         "PORT": urlparse(os.environ.get("ELASTICSEARCH_URL")).port,
         "INDEX_NAME": ELASTICSEARCH_INDEX,
@@ -354,7 +361,7 @@ CELERY_BROKER_URL = env.str("CELERY_BROKER_URL", "amqp://guest:guest@rabbitmq//"
 BROKER_URL = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ["pickle"]
 CELERY_TASK_SERIALIZER = "pickle"
-CELERY_RESULT_BACKEND = "djcelery.backends.database:DatabaseBackend"
+CELERY_RESULT_BACKEND = "django-db"
 
 
 from celery.schedules import crontab
@@ -406,7 +413,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env.str("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY", None)
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env.str("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET", None)
 
 AUTHENTICATION_BACKENDS = (
-    "social.backends.google.GoogleOAuth2",
+    "social_core.backends.google.GoogleOAuth2",
     "django.contrib.auth.backends.ModelBackend",
 )
 

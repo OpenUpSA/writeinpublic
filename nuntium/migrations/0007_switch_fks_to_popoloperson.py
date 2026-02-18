@@ -17,13 +17,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='answer',
             name='person',
-            field=models.ForeignKey(to='instance.PopoloPerson'),
+            field=models.ForeignKey(to='instance.PopoloPerson', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='nocontactom',
             name='person',
-            field=models.ForeignKey(to='instance.PopoloPerson'),
+            field=models.ForeignKey(to='instance.PopoloPerson', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

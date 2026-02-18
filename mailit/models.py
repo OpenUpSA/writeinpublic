@@ -25,7 +25,7 @@ class MailItTemplate(models.Model):
         blank=True,
         help_text=_('You can use {subject}, {content}, {person}, {author}, {site_url}, {site_name}, and {owner_email}'),
         )
-    writeitinstance = models.OneToOneField(WriteItInstance, related_name='mailit_template')
+    writeitinstance = models.OneToOneField(WriteItInstance, related_name='mailit_template', on_delete=models.CASCADE)
 
     def get_content_template(self):
         return self.content_template or default_content_template
@@ -38,14 +38,14 @@ post_save.connect(new_write_it_instance, sender=WriteItInstance)
 
 
 class BouncedMessageRecord(models.Model):
-    outbound_message = models.OneToOneField(OutboundMessage)
+    outbound_message = models.OneToOneField(OutboundMessage, on_delete=models.CASCADE)
     bounce_text = models.TextField()
     date = models.DateTimeField(auto_now=True)
 
 
 class RawIncomingEmail(models.Model):
     content = models.TextField()
-    writeitinstance = models.ForeignKey(WriteItInstance, related_name='raw_emails', null=True)
-    answer = models.OneToOneField(Answer, related_name='raw_email', null=True)
+    writeitinstance = models.ForeignKey(WriteItInstance, related_name='raw_emails', null=True, on_delete=models.SET_NULL)
+    answer = models.OneToOneField(Answer, related_name='raw_email', null=True, on_delete=models.SET_NULL)
     problem = models.BooleanField(default=False)
     message_id = models.CharField(max_length=2048, default="")

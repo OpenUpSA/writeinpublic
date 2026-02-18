@@ -2,10 +2,9 @@
 from __future__ import unicode_literals
 
 import re
-from urlparse import urlsplit, urlunsplit
+from urllib.parse import urlsplit, urlunsplit
 
 from django.db import migrations
-from django.contrib.contenttypes.management import update_contenttypes
 
 
 def is_proxy_url(url):
@@ -38,14 +37,11 @@ def update_source_url(original_url):
 
 
 def forwards(apps, schema_editor):
-    # Make sure the content types for django-popolo exist, with a
-    # hacky workaround from: http://stackoverflow.com/a/35353170/223092
-    popolo_app = apps.app_configs['popolo']
-    popolo_app.models_module = popolo_app.models_module or True
-    update_contenttypes(popolo_app, verbosity=1, interactive=False)
+    # Make sure the content type for popolo Person exists
     ContentType = apps.get_model('contenttypes', 'ContentType')
-    person_content_type = ContentType.objects.get(
-        app_label='popolo', model='person')
+    person_content_type, _ = ContentType.objects.get_or_create(
+        app_label='popolo', model='person',
+        defaults={'app_label': 'popolo', 'model': 'person'})
     # Create a PopoloSource for each old APIInstance
     ApiInstance = apps.get_model('popit', 'ApiInstance')
     PopoloSource = apps.get_model('popolo_sources', 'PopoloSource')

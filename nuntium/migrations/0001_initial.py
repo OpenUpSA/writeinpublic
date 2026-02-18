@@ -34,9 +34,9 @@ class Migration(migrations.Migration):
             name='AnswerAttachment',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('content', models.FileField(upload_to=b'attachments/%Y/%m/%d')),
-                ('name', models.CharField(default=b'', max_length=512)),
-                ('answer', models.ForeignKey(related_name='attachments', to='nuntium.Answer')),
+                ('content', models.FileField(upload_to='attachments/%Y/%m/%d')),
+                ('name', models.CharField(default='', max_length=512)),
+                ('answer', models.ForeignKey(related_name='attachments', to='nuntium.Answer', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('url', models.URLField(max_length=255)),
-                ('writeitinstance', models.ForeignKey(related_name='answer_webhooks', to='instance.WriteItInstance')),
+                ('writeitinstance', models.ForeignKey(related_name='answer_webhooks', to='instance.WriteItInstance', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -72,7 +72,7 @@ class Migration(migrations.Migration):
                 ('content_html', models.TextField(help_text='You can use {author_name}, {site_name}, {subject}, {content}, {recipients}, {confirmation_url}, and {message_url}', blank=True)),
                 ('content_text', models.TextField(help_text='You can use {author_name}, {site_name}, {subject}, {content}, {recipients}, {confirmation_url}, and {message_url}', blank=True)),
                 ('subject', models.CharField(help_text='You can use {author_name}, {site_name}, {subject}, {content}, {recipients}, {confirmation_url}, and {message_url}', max_length=512, blank=True)),
-                ('writeitinstance', models.OneToOneField(to='instance.WriteItInstance')),
+                ('writeitinstance', models.OneToOneField(to='instance.WriteItInstance', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -92,7 +92,7 @@ class Migration(migrations.Migration):
                 ('moderated', models.NullBooleanField()),
                 ('created', models.DateTimeField(auto_now_add=True, null=True)),
                 ('updated', models.DateTimeField(auto_now=True, null=True)),
-                ('writeitinstance', models.ForeignKey(to='instance.WriteItInstance')),
+                ('writeitinstance', models.ForeignKey(to='instance.WriteItInstance', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['-created'],
@@ -106,7 +106,7 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(max_length=255)),
                 ('datetime', models.DateField(default=datetime.datetime(2016, 7, 6, 11, 35, 48, 116612, tzinfo=utc))),
                 ('object_id', models.PositiveIntegerField()),
-                ('content_type', models.ForeignKey(to='contenttypes.ContentType')),
+                ('content_type', models.ForeignKey(to='contenttypes.ContentType', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -117,7 +117,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('key', models.CharField(max_length=256)),
-                ('message', models.OneToOneField(related_name='moderation', to='nuntium.Message')),
+                ('message', models.OneToOneField(related_name='moderation', to='nuntium.Message', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -130,7 +130,7 @@ class Migration(migrations.Migration):
                 ('template_html', models.TextField(help_text='You can use {author_name}, {person}, {subject}, {content}, {message_url}, and {site_name}', blank=True)),
                 ('template_text', models.TextField(help_text='You can use {author_name}, {person}, {subject}, {content}, {message_url}, and {site_name}', blank=True)),
                 ('subject_template', models.CharField(help_text='You can use {author_name}, {person}, {subject}, {content}, {message_url}, and {site_name}', max_length=255, blank=True)),
-                ('writeitinstance', models.OneToOneField(related_name='new_answer_notification_template', to='instance.WriteItInstance')),
+                ('writeitinstance', models.OneToOneField(related_name='new_answer_notification_template', to='instance.WriteItInstance', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -140,10 +140,10 @@ class Migration(migrations.Migration):
             name='NoContactOM',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('status', models.CharField(default=b'new', max_length=b'10', choices=[(b'new', 'Newly created'), (b'ready', 'Ready to send'), (b'sent', 'Sent'), (b'error', 'Error sending it'), (b'needmodera', 'Needs moderation')])),
-                ('message', models.ForeignKey(to='nuntium.Message')),
-                ('person', models.ForeignKey(to='popit.Person')),
-                ('site', models.ForeignKey(to='sites.Site')),
+                ('status', models.CharField(default='new', max_length=10, choices=[('new', 'Newly created'), ('ready', 'Ready to send'), ('sent', 'Sent'), ('error', 'Error sending it'), ('needmodera', 'Needs moderation')])),
+                ('message', models.ForeignKey(to='nuntium.Message', on_delete=models.CASCADE)),
+                ('person', models.ForeignKey(to='popit.Person', on_delete=models.CASCADE)),
+                ('site', models.ForeignKey(to='sites.Site', on_delete=models.CASCADE)),
             ],
             options={
                 'abstract': False,
@@ -154,10 +154,10 @@ class Migration(migrations.Migration):
             name='OutboundMessage',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('status', models.CharField(default=b'new', max_length=b'10', choices=[(b'new', 'Newly created'), (b'ready', 'Ready to send'), (b'sent', 'Sent'), (b'error', 'Error sending it'), (b'needmodera', 'Needs moderation')])),
-                ('contact', models.ForeignKey(to='contactos.Contact')),
-                ('message', models.ForeignKey(to='nuntium.Message')),
-                ('site', models.ForeignKey(to='sites.Site')),
+                ('status', models.CharField(default='new', max_length=10, choices=[('new', 'Newly created'), ('ready', 'Ready to send'), ('sent', 'Sent'), ('error', 'Error sending it'), ('needmodera', 'Needs moderation')])),
+                ('contact', models.ForeignKey(to='contactos.Contact', on_delete=models.CASCADE)),
+                ('message', models.ForeignKey(to='nuntium.Message', on_delete=models.CASCADE)),
+                ('site', models.ForeignKey(to='sites.Site', on_delete=models.CASCADE)),
             ],
             options={
                 'abstract': False,
@@ -169,7 +169,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('key', models.CharField(max_length=255)),
-                ('outbound_message', models.OneToOneField(to='nuntium.OutboundMessage')),
+                ('outbound_message', models.OneToOneField(to='nuntium.OutboundMessage', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -182,8 +182,8 @@ class Migration(migrations.Migration):
                 ('sent', models.BooleanField(default=False)),
                 ('number_of_attempts', models.PositiveIntegerField(default=0)),
                 ('try_again', models.BooleanField(default=True)),
-                ('outbound_message', models.ForeignKey(to='nuntium.OutboundMessage')),
-                ('plugin', models.ForeignKey(to='djangoplugins.Plugin')),
+                ('outbound_message', models.ForeignKey(to='nuntium.OutboundMessage', on_delete=models.CASCADE)),
+                ('plugin', models.ForeignKey(to='djangoplugins.Plugin', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -196,7 +196,7 @@ class Migration(migrations.Migration):
                 ('email', models.EmailField(max_length=75)),
                 ('day', models.DateField()),
                 ('count', models.PositiveIntegerField(default=1)),
-                ('writeitinstance', models.ForeignKey(to='instance.WriteItInstance')),
+                ('writeitinstance', models.ForeignKey(to='instance.WriteItInstance', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -207,7 +207,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('email', models.EmailField(max_length=75)),
-                ('message', models.ForeignKey(related_name='subscribers', to='nuntium.Message')),
+                ('message', models.ForeignKey(related_name='subscribers', to='nuntium.Message', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -216,19 +216,19 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='confirmation',
             name='message',
-            field=models.OneToOneField(to='nuntium.Message'),
+            field=models.OneToOneField(to='nuntium.Message', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='answer',
             name='message',
-            field=models.ForeignKey(related_name='answers', to='nuntium.Message'),
+            field=models.ForeignKey(related_name='answers', to='nuntium.Message', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='answer',
             name='person',
-            field=models.ForeignKey(to='popit.Person'),
+            field=models.ForeignKey(to='popit.Person', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.CreateModel(

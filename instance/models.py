@@ -25,7 +25,7 @@ from requests.exceptions import ConnectionError
 from subdomains.utils import reverse
 
 from contactos.models import Contact
-from mailit import MailChannel
+from mailit.channel import MailChannel
 logger = logging.getLogger(__name__)
 
 
@@ -255,7 +255,7 @@ class WriteItInstance(models.Model):
     persons = models.ManyToManyField(PopoloPerson,
         related_name='writeit_instances',
         through='InstanceMembership')
-    owner = models.ForeignKey(User, related_name="writeitinstances")
+    owner = models.ForeignKey(User, related_name="writeitinstances", on_delete=models.CASCADE)
 
     def add_person(self, person):
         """Ensure there's exactly one link between the instance and a person"""
@@ -319,12 +319,12 @@ class WriteItInstance(models.Model):
                 Contact.objects.filter(
                     writeitinstance=self,
                     person=person).update(enabled=False)
-        except ConnectionError, e:
+        except ConnectionError as e:
             self.do_something_with_a_vanished_popit_api_instance(popolo_source)
             logger.exception("We could not connect with the URL")
             e.message = _('We could not connect with the URL')
             return (False, e)
-        except Exception, e:
+        except Exception as e:
             self.do_something_with_a_vanished_popit_api_instance(popolo_source)
             logger.exception("Unexpected error relating persons with popolo JSON")
             return (False, e)
@@ -384,8 +384,8 @@ class WriteItInstance(models.Model):
 
 
 class InstanceMembership(models.Model):
-    person = models.ForeignKey(PopoloPerson)
-    writeitinstance = models.ForeignKey(WriteItInstance)
+    person = models.ForeignKey(PopoloPerson, on_delete=models.CASCADE)
+    writeitinstance = models.ForeignKey(WriteItInstance, on_delete=models.CASCADE)
 
 
 def new_write_it_instance(sender, instance, created, **kwargs):
@@ -418,15 +418,15 @@ class WriteitInstancePopitInstanceRecord(models.Model):
         ("waiting", _("Waiting")),
         ("inprogress", _("In Progress")),
         )
-    writeitinstance = models.ForeignKey(WriteItInstance)
-    popolo_source = models.ForeignKey(PopoloSource)
+    writeitinstance = models.ForeignKey(WriteItInstance, on_delete=models.CASCADE)
+    popolo_source = models.ForeignKey(PopoloSource, on_delete=models.CASCADE)
     periodicity = models.CharField(
-        max_length="2",
+        max_length=2,
         choices=PERIODICITY,
         default='1W',
         )
     status = models.CharField(
-        max_length="20",
+        max_length=20,
         choices=STATUS_CHOICES,
         default="nothing",
         )
@@ -447,7 +447,7 @@ class WriteitInstancePopitInstanceRecord(models.Model):
 
 
 class WriteItInstanceConfig(models.Model):
-    writeitinstance = AutoOneToOneField(WriteItInstance, related_name='config')
+    writeitinstance = AutoOneToOneField(WriteItInstance, related_name='config', on_delete=models.CASCADE)
     testing_mode = models.BooleanField(default=True)
     moderation_needed_in_all_messages = models.BooleanField(
         help_text=_("Every message is going to \

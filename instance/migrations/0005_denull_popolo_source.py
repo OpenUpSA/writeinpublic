@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='writeitinstancepopitinstancerecord',
             name='popolo_source',
-            field=models.ForeignKey(to='popolo_sources.PopoloSource'),
+            field=models.ForeignKey(to='popolo_sources.PopoloSource', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

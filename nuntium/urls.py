@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.views.generic.base import TemplateView
 
 from nuntium.views import (
@@ -13,7 +13,7 @@ from nuntium.user_section.views import (
     ContactUsView,
 )
 
-urlpatterns = patterns('',
+urlpatterns = [
     # Examples:
     url(r'^$', HomeTemplateView.as_view(template_name='home.html'), name='home'),
     url(r'^instances/?$', WriteItInstanceListView.as_view(template_name='nuntium/template_list.html'), name='instance_list'),
@@ -28,4 +28,4 @@ urlpatterns = patterns('',
         r"^robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
-)
+]

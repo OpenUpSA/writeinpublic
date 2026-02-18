@@ -9,7 +9,7 @@ from django.forms import Form, URLField
 from django.conf import settings
 from django.core.management import call_command
 from django.utils.unittest import skip
-from user_section_views_tests import UserSectionTestCase
+from .user_section_views_tests import UserSectionTestCase
 from django.utils.translation import ugettext as _
 from nuntium.user_section.forms import RelatePopitInstanceWithWriteItInstance
 from nuntium.management.commands.back_fill_writeit_popit_records import WPBackfillRecords

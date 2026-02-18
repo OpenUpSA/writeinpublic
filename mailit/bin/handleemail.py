@@ -5,7 +5,7 @@ import requests
 from requests.auth import AuthBase
 import logging
 import sys
-import config
+from . import config
 import json
 from email_reply_parser import EmailReplyParser
 from flufl.bounce import all_failures, scan_message

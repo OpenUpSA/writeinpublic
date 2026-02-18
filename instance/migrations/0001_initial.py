@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
             name='Membership',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('person', models.ForeignKey(to='popit.Person')),
+                ('person', models.ForeignKey(to='popit.Person', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -31,8 +31,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=255)),
                 ('description', models.CharField(max_length=512, blank=True)),
-                ('slug', autoslug.fields.AutoSlugField(populate_from=b'name', unique=True, editable=False)),
-                ('owner', models.ForeignKey(related_name='writeitinstances', to=settings.AUTH_USER_MODEL)),
+                ('slug', autoslug.fields.AutoSlugField(populate_from='name', unique=True, editable=False)),
+                ('owner', models.ForeignKey(related_name='writeitinstances', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
                 ('persons', models.ManyToManyField(related_name='writeit_instances', through='instance.Membership', to='popit.Person')),
             ],
             options={
@@ -56,10 +56,10 @@ class Migration(migrations.Migration):
                 ('email_port', models.IntegerField(null=True, blank=True)),
                 ('email_use_tls', models.NullBooleanField()),
                 ('email_use_ssl', models.NullBooleanField()),
-                ('can_create_answer', models.BooleanField(default=False, help_text=b'Can create an answer using the WebUI')),
+                ('can_create_answer', models.BooleanField(default=False, help_text='Can create an answer using the WebUI')),
                 ('maximum_recipients', models.PositiveIntegerField(default=5)),
-                ('default_language', models.CharField(max_length=10, choices=[(b'ar', b'Arabic'), (b'cs', b'Czech'), (b'en', b'English'), (b'es', b'Spanish'), (b'fr', b'French'), (b'hu', b'Hungarian')])),
-                ('writeitinstance', annoying.fields.AutoOneToOneField(related_name='config', to='instance.WriteItInstance')),
+                ('default_language', models.CharField(max_length=10, choices=[('ar', 'Arabic'), ('cs', 'Czech'), ('en', 'English'), ('es', 'Spanish'), ('fr', 'French'), ('hu', 'Hungarian')])),
+                ('writeitinstance', annoying.fields.AutoOneToOneField(related_name='config', to='instance.WriteItInstance', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -69,13 +69,13 @@ class Migration(migrations.Migration):
             name='WriteitInstancePopitInstanceRecord',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('periodicity', models.CharField(default=b'1W', max_length=b'2', choices=[(b'--', b'Never'), (b'2D', b'Twice every Day'), (b'1D', b'Daily'), (b'1W', b'Weekly')])),
-                ('status', models.CharField(default=b'nothing', max_length=b'20', choices=[(b'nothing', 'Not doing anything now'), (b'error', 'Error'), (b'success', 'Success'), (b'waiting', 'Waiting'), (b'inprogress', 'In Progress')])),
-                ('status_explanation', models.TextField(default=b'')),
+                ('periodicity', models.CharField(default='1W', max_length=2, choices=[('--', 'Never'), ('2D', 'Twice every Day'), ('1D', 'Daily'), ('1W', 'Weekly')])),
+                ('status', models.CharField(default='nothing', max_length=20, choices=[('nothing', 'Not doing anything now'), ('error', 'Error'), ('success', 'Success'), ('waiting', 'Waiting'), ('inprogress', 'In Progress')])),
+                ('status_explanation', models.TextField(default='')),
                 ('updated', models.DateTimeField(auto_now_add=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
-                ('popitapiinstance', models.ForeignKey(to='popit.ApiInstance')),
-                ('writeitinstance', models.ForeignKey(to='instance.WriteItInstance')),
+                ('popitapiinstance', models.ForeignKey(to='popit.ApiInstance', on_delete=models.CASCADE)),
+                ('writeitinstance', models.ForeignKey(to='instance.WriteItInstance', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -84,7 +84,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='membership',
             name='writeitinstance',
-            field=models.ForeignKey(to='instance.WriteItInstance'),
+            field=models.ForeignKey(to='instance.WriteItInstance', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
             name='MailItTemplate',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('subject_template', models.CharField(default=b'{subject}', help_text='You can use {subject}, {content}, {person}, {author}, {site_url}, {site_name}, and {owner_email}', max_length=255)),
+                ('subject_template', models.CharField(default='{subject}', help_text='You can use {subject}, {content}, {person}, {author}, {site_url}, {site_name}, and {owner_email}', max_length=255)),
                 ('content_template', models.TextField(help_text='You can use {subject}, {content}, {person}, {author}, {site_url}, {site_name}, and {owner_email}', blank=True)),
                 ('content_html_template', models.TextField(help_text='You can use {subject}, {content}, {person}, {author}, {site_url}, {site_name}, and {owner_email}', blank=True)),
             ],
@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('content', models.TextField()),
                 ('problem', models.BooleanField(default=False)),
-                ('message_id', models.CharField(default=b'', max_length=2048)),
+                ('message_id', models.CharField(default='', max_length=2048)),
             ],
             options={
             },
@@ -50,25 +50,25 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='rawincomingemail',
             name='answer',
-            field=models.OneToOneField(related_name='raw_email', null=True, to='nuntium.Answer'),
+            field=models.OneToOneField(related_name='raw_email', null=True, to='nuntium.Answer', on_delete=models.SET_NULL),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='rawincomingemail',
             name='writeitinstance',
-            field=models.ForeignKey(related_name='raw_emails', to='instance.WriteItInstance', null=True),
+            field=models.ForeignKey(related_name='raw_emails', to='instance.WriteItInstance', null=True, on_delete=models.SET_NULL),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='mailittemplate',
             name='writeitinstance',
-            field=models.OneToOneField(related_name='mailit_template', to='instance.WriteItInstance'),
+            field=models.OneToOneField(related_name='mailit_template', to='instance.WriteItInstance', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='bouncedmessagerecord',
             name='outbound_message',
-            field=models.OneToOneField(to='nuntium.OutboundMessage'),
+            field=models.OneToOneField(to='nuntium.OutboundMessage', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

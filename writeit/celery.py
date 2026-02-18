@@ -7,6 +7,7 @@ from celery import Celery
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'writeit.settings')
 
+import writeit.compat  # noqa: F401 - patches removed Django APIs for old third-party packages
 from django.conf import settings  # noqa
 
 app = Celery('writeit')

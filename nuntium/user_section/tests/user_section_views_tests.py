@@ -13,7 +13,7 @@ from nuntium.user_section.forms import WriteItInstanceBasicForm, \
     WriteItInstanceCreateForm, \
     NewAnswerNotificationTemplateForm, ConfirmationTemplateForm
 from django.test.utils import override_settings
-from urlparse import urlparse
+from urllib.parse import urlparse
 import json
 from nuntium.user_section.views import WriteItInstanceCreateView
 

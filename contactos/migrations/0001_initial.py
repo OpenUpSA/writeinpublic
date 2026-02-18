@@ -41,25 +41,25 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contact',
             name='contact_type',
-            field=models.ForeignKey(to='contactos.ContactType'),
+            field=models.ForeignKey(to='contactos.ContactType', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='contact',
             name='owner',
-            field=models.ForeignKey(related_name='contacts', to=settings.AUTH_USER_MODEL, null=True),
+            field=models.ForeignKey(related_name='contacts', to=settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='contact',
             name='person',
-            field=models.ForeignKey(to='popit.Person'),
+            field=models.ForeignKey(to='popit.Person', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='contact',
             name='writeitinstance',
-            field=models.ForeignKey(related_name='contacts', to='instance.WriteItInstance', null=True),
+            field=models.ForeignKey(related_name='contacts', to='instance.WriteItInstance', null=True, on_delete=models.SET_NULL),
             preserve_default=True,
         ),
     ]

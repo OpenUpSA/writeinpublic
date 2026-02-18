@@ -1,5 +1,5 @@
 # coding=utf-8
-from urlparse import urlsplit, urlunsplit
+from urllib.parse import urlsplit, urlunsplit
 from global_test_case import GlobalTestCase as TestCase, popit_load_data
 from subdomains.utils import reverse
 from instance.models import InstanceMembership, PopoloPerson, WriteItInstance

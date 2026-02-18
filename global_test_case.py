@@ -72,7 +72,7 @@ class UsingDbMixin(object):
         super(UsingDbMixin, self).tearDown(*args, **kwargs)
 
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 
 def get_path_and_subdomain(path, **extra):
@@ -156,11 +156,10 @@ class SearchIndexTestCase(GlobalTestCase):
         super(SearchIndexTestCase, self).setUp()
         call_command('rebuild_index', verbosity=0, interactive=False)
 
-from djcelery.contrib.test_runner import CeleryTestSuiteRunner
 from django_nose import NoseTestSuiteRunner
 
 
-class WriteItTestRunner(CeleryTestSuiteRunner, NoseTestSuiteRunner):
+class WriteItTestRunner(NoseTestSuiteRunner):
     def run_tests(self, test_labels, extra_tests=None, **kwargs):
 
         # don't show logging messages while testing
