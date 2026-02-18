@@ -14,7 +14,6 @@ from formtools.wizard.views import NamedUrlSessionWizardView
 from django.shortcuts import get_object_or_404, redirect, render
 
 from itertools import chain
-from django.contrib.postgres.search import SearchVector, SearchQuery
 from django.core.paginator import Paginator
 from django.db.models import Q
 from instance.models import PopoloPerson, WriteItInstance
@@ -261,15 +260,14 @@ class RootRedirectView(RedirectView):
 def _search_results(query, writeitinstance=None):
     if not query:
         return []
-    search_query = SearchQuery(query)
-    messages = Message.public_objects.annotate(
-        search=SearchVector('subject', 'content'),
-    ).filter(search=search_query)
+    messages = Message.public_objects.filter(
+        Q(subject__icontains=query) | Q(content__icontains=query)
+    )
     answers = Answer.objects.filter(
         message__in=Message.public_objects.all()
-    ).annotate(
-        search=SearchVector('content', 'person__name'),
-    ).filter(search=search_query)
+    ).filter(
+        Q(content__icontains=query) | Q(person__name__icontains=query)
+    )
     if writeitinstance is not None:
         messages = messages.filter(writeitinstance=writeitinstance)
         answers = answers.filter(message__writeitinstance=writeitinstance)
