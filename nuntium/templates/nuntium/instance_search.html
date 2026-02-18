@@ -3,20 +3,15 @@
 {% load subdomainurls %}
 {% block content %}
 {% load markdown_deux_tags %}
-<ul class="flash-messages">
-{% for message in messages %}
-<li>{{ message }}</li>
-{% endfor %}
-</ul>
+
 {% if query %}
     <h3>{% trans 'Results' %}</h3>
-    {% for result in page.object_list %}
+    {% for result in page %}
         <div class="search_result">
-            {% if result.model_name == 'message' %}
-                {% include 'nuntium/message/message_in_list.html' with message=result.object %}
-            {% endif %}
-            {% if result.model_name == 'answer' %}
-                {% include 'nuntium/answer/answer_in_list.html' with answer=result.object %}
+            {% if result.subject %}
+                {% include 'nuntium/message/message_in_list.html' with message=result %}
+            {% else %}
+                {% include 'nuntium/answer/answer_in_list.html' with answer=result %}
             {% endif %}
         </div>
     {% empty %}
@@ -37,11 +32,11 @@
 {% endblock content %}
 
 {% block search_form %}
-<form class="navbar-form navbar-right" method="get"  role="form">
+<form class="navbar-form navbar-right" method="get" role="form">
     <div class="form-group">
-        <label class="sr-only" for="exampleInputEmail2">Search within messages</label>
-        <input type="text" class="form-control" name="q" id="id_q" placeholder="{% trans 'Search within messages' %}" value="{{ form.q.value }}">
+        <label class="sr-only" for="id_q">{% trans 'Search within messages' %}</label>
+        <input type="text" class="form-control" name="q" id="id_q" placeholder="{% trans 'Search within messages' %}" value="{{ query }}">
     </div>
-    <button type="submit" class="btn btn-success" >{% trans 'Search' %}</button>
+    <button type="submit" class="btn btn-success">{% trans 'Search' %}</button>
 </form>
-{% endblock search_form%}
+{% endblock search_form %}

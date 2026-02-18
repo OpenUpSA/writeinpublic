@@ -9,7 +9,6 @@ from .models import Message, Confirmation
 from popolo.models import Person
 from django.forms import ValidationError
 from django.utils.translation import ugettext as _, ungettext, pgettext_lazy
-from haystack.forms import SearchForm
 from django.utils.html import format_html
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
@@ -192,16 +191,6 @@ class PreviewForm(ModelForm):
         model = Message
         fields = []
 
-
-class MessageSearchForm(SearchForm):
-    pass
-
-
-class PerInstanceSearchForm(SearchForm):
-    def __init__(self, *args, **kwargs):
-        self.writeitinstance = kwargs.pop('writeitinstance', None)
-        super(PerInstanceSearchForm, self).__init__(*args, **kwargs)
-        self.searchqueryset = self.searchqueryset.filter(writeitinstance=self.writeitinstance.id)
 
 
 class PopitParsingFormMixin(object):

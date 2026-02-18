@@ -4,7 +4,7 @@ from django.views.generic.base import TemplateView
 from nuntium.views import (
     HelpView,
     HomeTemplateView,
-    MessageSearchView,
+    search_messages,
     WriteItInstanceListView,
     VersionView,
     )
@@ -19,7 +19,7 @@ urlpatterns = patterns('',
     url(r'^instances/?$', WriteItInstanceListView.as_view(template_name='nuntium/template_list.html'), name='instance_list'),
     url(r'^contact/$', ContactUsView.as_view(), name='contact_us'),
 
-    url(r'^search/?$', MessageSearchView(), name='search_messages'),
+    url(r'^search/?$', search_messages, name='search_messages'),
 
     url(r'^help/(?P<section_name>\w+)/?$', HelpView.as_view(), name='help_section'),
     url(r'^help/?$', HelpView.as_view()),

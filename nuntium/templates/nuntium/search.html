@@ -3,35 +3,24 @@
 {% load subdomainurls %}
 {% block content %}
 {% load markdown_deux_tags %}
-<ul class="flash-messages">
-{% for message in messages %}
-<li>{{ message }}</li>
-{% endfor %}
-</ul>
 
-<form method="get" >
+<form method="get">
     <table>
-        {{ form.as_table }}
         <tr>
-            <td>&nbsp;</td>
-            <td>
-                <input type="submit" value="{% trans 'Search' %}">
-            </td>
+            <td><input type="text" name="q" value="{{ query }}" /></td>
+            <td><input type="submit" value="{% trans 'Search' %}"></td>
         </tr>
     </table>
 </form>
 
-
-
 {% if query %}
     <h3>{% trans 'Results' %}</h3>
-    {% for result in page.object_list %}
+    {% for result in page %}
         <div class="search_result">
-            {% if result.model_name == 'message' %}
-                {% include 'nuntium/message/message_in_list.html' with message=result.object %}
-            {% endif %}
-            {% if result.model_name == 'answer' %}
-                {% include 'nuntium/answer/answer_in_list.html' with answer=result.object %}
+            {% if result.subject %}
+                {% include 'nuntium/message/message_in_list.html' with message=result %}
+            {% else %}
+                {% include 'nuntium/answer/answer_in_list.html' with answer=result %}
             {% endif %}
         </div>
     {% empty %}
