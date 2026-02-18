@@ -5,6 +5,7 @@ services:
 
   web:
     build: .
+    user: root
     volumes:
       - .:/app
       - web-attachments:/app/attachments
@@ -27,6 +28,7 @@ services:
 
   worker:
     build: .
+    user: root
     volumes:
       - .:/app
       - web-attachments:/app/attachments
@@ -42,6 +44,7 @@ services:
 
   beat:
     build: .
+    user: root
     volumes:
       - .:/app
       - beat-data:/var/celerybeat
