@@ -11,15 +11,15 @@ from django.views.generic import View, TemplateView, DetailView, RedirectView, L
 from subdomains.utils import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from formtools.wizard.views import NamedUrlSessionWizardView
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 
-from haystack.views import SearchView
 from itertools import chain
+from django.contrib.postgres.search import SearchVector, SearchQuery
+from django.core.paginator import Paginator
 from django.db.models import Q
 from instance.models import PopoloPerson, WriteItInstance
 from popolo.models import Membership
 from .models import Confirmation, Message, Moderation, Answer
-from .forms import MessageSearchForm, PerInstanceSearchForm
 
 from nuntium import forms
 
@@ -258,31 +258,46 @@ class RootRedirectView(RedirectView):
         return url
 
 
-class MessageSearchView(SearchView):
-    def __init__(self, *args, **kwargs):
-        super(MessageSearchView, self).__init__(*args, **kwargs)
-        self.form_class = MessageSearchForm
-        self.template = 'nuntium/search.html'
+def _search_results(query, writeitinstance=None):
+    if not query:
+        return []
+    search_query = SearchQuery(query)
+    messages = Message.public_objects.annotate(
+        search=SearchVector('subject', 'content'),
+    ).filter(search=search_query)
+    answers = Answer.objects.filter(
+        message__in=Message.public_objects.all()
+    ).annotate(
+        search=SearchVector('content', 'person__name'),
+    ).filter(search=search_query)
+    if writeitinstance is not None:
+        messages = messages.filter(writeitinstance=writeitinstance)
+        answers = answers.filter(message__writeitinstance=writeitinstance)
+    return sorted(
+        chain(messages, answers),
+        key=lambda x: x.created, reverse=True
+    )
 
 
-class PerInstanceSearchView(SearchView):
-    def __init__(self, *args, **kwargs):
-        super(PerInstanceSearchView, self).__init__(*args, **kwargs)
-        self.form_class = PerInstanceSearchForm
-        self.template = 'nuntium/instance_search.html'
+def search_messages(request):
+    query = request.GET.get('q', '')
+    results = _search_results(query)
+    paginator = Paginator(results, 20)
+    page = paginator.get_page(request.GET.get('page', 1))
+    return render(request, 'nuntium/search.html', {
+        'query': query, 'page': page,
+    })
 
-    def __call__(self, *args, **kwargs):
-        request = args[0]
-        self.slug = request.subdomain
-        return super(PerInstanceSearchView, self).__call__(*args, **kwargs)
 
-    def build_form(self, form_kwargs=None):
-        self.writeitinstance = WriteItInstance.objects.get(slug=self.slug)
-        if form_kwargs is None:
-            form_kwargs = {}
-        form_kwargs['writeitinstance'] = self.writeitinstance
-
-        return super(PerInstanceSearchView, self).build_form(form_kwargs)
+def per_instance_search(request):
+    writeitinstance = get_object_or_404(WriteItInstance, slug=request.subdomain)
+    query = request.GET.get('q', '')
+    results = _search_results(query, writeitinstance=writeitinstance)
+    paginator = Paginator(results, 20)
+    page = paginator.get_page(request.GET.get('page', 1))
+    return render(request, 'nuntium/instance_search.html', {
+        'query': query, 'page': page, 'writeitinstance': writeitinstance,
+    })
 
 
 class MessagesPerPersonView(ListView):

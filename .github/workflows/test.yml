@@ -16,7 +16,7 @@ jobs:
       - name: Run tests
         run: docker compose run --rm web bin/wait-for-deps.sh coverage run --source=nuntium,contactos,mailit,instance,mailreporter manage.py test nuntium contactos mailit instance mailreporter
 
-      - run: docker compose logs db elasticsearch
+      - run: docker compose logs db
         if: ${{ always() }}
 
       # Run codecov passing appropriate codecov.io CI environment variables to container
