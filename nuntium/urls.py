@@ -19,7 +19,7 @@ urlpatterns = patterns('',
     url(r'^instances/?$', WriteItInstanceListView.as_view(template_name='nuntium/template_list.html'), name='instance_list'),
     url(r'^contact/$', ContactUsView.as_view(), name='contact_us'),
 
-    url(r'^search/?$', MessageSearchView(), name='search_messages'),
+    url(r'^search/?$', MessageSearchView.as_view(), name='search_messages'),
 
     url(r'^help/(?P<section_name>\w+)/?$', HelpView.as_view(), name='help_section'),
     url(r'^help/?$', HelpView.as_view()),

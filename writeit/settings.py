@@ -9,8 +9,6 @@ from django.conf.global_settings import LANGUAGES
 from django.utils.translation import to_locale
 import environ
 
-from urlparse import urlparse
-
 env = environ.Env()
 
 DEBUG = env.bool("DJANGO_DEBUG", False)
@@ -200,7 +198,6 @@ INSTALLED_APPS = (
     "django.contrib.staticfiles",
     "social.apps.django_app.default",
     "annoying",
-    "celery_haystack",
     "djcelery",
     "debug_toolbar",
     "instance",
@@ -217,8 +214,6 @@ INSTALLED_APPS = (
     "tastypie",
     "markdown_deux",
     "django_extensions",
-    # Searching.
-    "haystack",
     "pipeline",
     # Uncomment the next line to enable the admin:
     "django_admin_bootstrapped",
@@ -234,21 +229,6 @@ INSTALLED_APPS = (
 
 if TESTING:
     INSTALLED_APPS += ("django_nose",)
-
-# SEARCH INDEX WITH ELASTICSEARCH
-HAYSTACK_SIGNAL_PROCESSOR = "celery_haystack.signals.CelerySignalProcessor"
-
-ELASTICSEARCH_URL = env.str("ELASTICSEARCH_URL")
-ELASTICSEARCH_INDEX = env.str("ELASTICSEARCH_INDEX")
-
-HAYSTACK_CONNECTIONS = {
-    "default": {
-        "ENGINE": "haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine",
-        "URL": ELASTICSEARCH_URL,
-        "PORT": urlparse(os.environ.get("ELASTICSEARCH_URL")).port,
-        "INDEX_NAME": ELASTICSEARCH_INDEX,
-    },
-}
 
 # Testing with django
 TEST_RUNNER = "global_test_case.WriteItTestRunner"
@@ -415,12 +395,6 @@ SESSION_COOKIE_DOMAIN = env.str("SESSION_COOKIE_DOMAIN", "localhost")
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_ENABLE_UTC = True
 CELERY_CREATE_MISSING_QUEUES = True
-CELERY_HAYSTACK_TRANSACTION_SAFE = True
-CELERY_HAYSTACK_DEFAULT_ALIAS = None
-CELERY_HAYSTACK_RETRY_DELAY = 5 * 60
-CELERY_HAYSTACK_MAX_RETRIES = 1
-CELERY_HAYSTACK_DEFAULT_TASK = "celery_haystack.tasks.CeleryHaystackSignalHandler"
-
 # These can be set independently, but most often one will be set to True and
 # the other to False. Setting both to the same boolean value will have
 # undefined behaviour.
@@ -428,9 +402,7 @@ WEB_BASED = True
 API_BASED = False
 
 if TESTING:
-    LOCAL_ELASTICSEARCH = True
     CELERY_ALWAYS_EAGER = True
-    ELASTICSEARCH_INDEX += "-test"
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

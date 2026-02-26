@@ -14,7 +14,6 @@ services:
     command: bin/wait-for-deps.sh ./manage.py runserver 0.0.0.0:8000
     depends_on:
       - db
-      - elasticsearch
       - rabbitmq
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq//
@@ -23,8 +22,6 @@ services:
       - DJANGO_DEBUG_TOOLBAR
       - DJANGO_SECRET_KEY=not-secret-in-dev
       - DJANGO_TESTING
-      - ELASTICSEARCH_INDEX=writeinpublic
-      - ELASTICSEARCH_URL=http://elasticsearch:9200/
       - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
       - SESSION_COOKIE_DOMAIN=127.0.0.1.nip.io
 
@@ -36,14 +33,11 @@ services:
     command: bin/wait-for-deps.sh celery -A writeit worker
     depends_on:
       - db
-      - elasticsearch
       - rabbitmq
     environment:
       - DATABASE_URL=postgresql://writeinpublic:devpassword@db/writeinpublic
       - DJANGO_DEBUG=True
       - DJANGO_SECRET_KEY=not-secret-in-dev
-      - ELASTICSEARCH_INDEX=writeinpublic
-      - ELASTICSEARCH_URL=http://elasticsearch:9200/
       - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 
   beat:
@@ -54,14 +48,11 @@ services:
     command: bin/wait-for-deps.sh celery -A writeit beat --pidfile= -s /var/celerybeat/celerybeat-schedule
     depends_on:
       - db
-      - elasticsearch
       - rabbitmq
     environment:
       - DATABASE_URL=postgresql://writeinpublic:devpassword@db/writeinpublic
       - DJANGO_DEBUG=True
       - DJANGO_SECRET_KEY=not-secret-in-dev
-      - ELASTICSEARCH_INDEX=writeinpublic
-      - ELASTICSEARCH_URL=http://elasticsearch:9200/
       - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 
   db:
@@ -72,15 +63,6 @@ services:
       - POSTGRES_DB=writeinpublic
     volumes:
       - db-data:/var/lib/postgresql/data
-
-  elasticsearch:
-    image: elasticsearch:1
-    volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
-    environment:
-      - ES_MAX_MEM=1g
-    ports:
-      - 9200
 
   rabbitmq:
     image: rabbitmq:3.7.28-management
@@ -96,6 +78,5 @@ volumes:
   web-attachments:
   web-coverage:
   db-data:
-  elasticsearch-data:
   rabbitmq-data:
   beat-data:

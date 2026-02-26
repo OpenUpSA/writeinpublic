@@ -1,7 +1,7 @@
 # coding=utf-8
 import urlparse
 
-from django.forms import ModelForm, ModelMultipleChoiceField, SelectMultiple, URLField, Form, Textarea, TextInput, EmailInput
+from django.forms import ModelForm, ModelMultipleChoiceField, SelectMultiple, URLField, Form, Textarea, TextInput, EmailInput, CharField
 from contactos.models import Contact
 from instance.models import WriteItInstance
 from .models import Message, Confirmation
@@ -9,7 +9,6 @@ from .models import Message, Confirmation
 from popolo.models import Person
 from django.forms import ValidationError
 from django.utils.translation import ugettext as _, ungettext, pgettext_lazy
-from haystack.forms import SearchForm
 from django.utils.html import format_html
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
@@ -193,15 +192,16 @@ class PreviewForm(ModelForm):
         fields = []
 
 
-class MessageSearchForm(SearchForm):
-    pass
+class MessageSearchForm(Form):
+    q = CharField(required=False, label='')
 
 
-class PerInstanceSearchForm(SearchForm):
+class PerInstanceSearchForm(Form):
+    q = CharField(required=False, label='')
+
     def __init__(self, *args, **kwargs):
         self.writeitinstance = kwargs.pop('writeitinstance', None)
         super(PerInstanceSearchForm, self).__init__(*args, **kwargs)
-        self.searchqueryset = self.searchqueryset.filter(writeitinstance=self.writeitinstance.id)
 
 
 class PopitParsingFormMixin(object):
