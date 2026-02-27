@@ -1,10 +1,7 @@
 import re
 
 from django.test import TestCase
-from unittest import skipUnless
-from django.core.management import call_command
 from tastypie.test import ResourceTestCase
-from django.conf import settings
 from django.contrib.sites.models import Site
 import os
 import subprocess
@@ -13,7 +10,6 @@ from django.db import DEFAULT_DB_ALIAS
 from django.test import RequestFactory
 from django.test.client import Client
 import logging
-from haystack.signals import BaseSignalProcessor
 
 _LOCALS = threading.local()
 
@@ -150,11 +146,7 @@ class ResourceGlobalTestCase(WriteItTestCaseMixin, ResourceTestCase):
     pass
 
 
-@skipUnless(settings.LOCAL_ELASTICSEARCH, "No local elasticsearch")
-class SearchIndexTestCase(GlobalTestCase):
-    def setUp(self):
-        super(SearchIndexTestCase, self).setUp()
-        call_command('rebuild_index', verbosity=0, interactive=False)
+SearchIndexTestCase = GlobalTestCase
 
 from djcelery.contrib.test_runner import CeleryTestSuiteRunner
 from django_nose import NoseTestSuiteRunner
@@ -168,9 +160,6 @@ class WriteItTestRunner(CeleryTestSuiteRunner, NoseTestSuiteRunner):
 
         return super(WriteItTestRunner, self).run_tests(test_labels, extra_tests, **kwargs)
 
-
-class CeleryTestingSignalProcessor(BaseSignalProcessor):
-    pass
 
 
 from vcr import VCR

@@ -6,14 +6,14 @@ from datetime import date, datetime
 from os.path import dirname
 
 import django
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Prefetch
 from django.views.generic import View, TemplateView, DetailView, RedirectView, ListView
 from subdomains.utils import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from formtools.wizard.views import NamedUrlSessionWizardView
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 
-from haystack.views import SearchView
 from itertools import chain
 from django.db.models import Q
 from instance.models import PopoloPerson, WriteItInstance
@@ -258,31 +258,81 @@ class RootRedirectView(RedirectView):
         return url
 
 
-class MessageSearchView(SearchView):
-    def __init__(self, *args, **kwargs):
-        super(MessageSearchView, self).__init__(*args, **kwargs)
-        self.form_class = MessageSearchForm
-        self.template = 'nuntium/search.html'
+class _SearchResult(object):
+    def __init__(self, obj):
+        self.object = obj
+        self.model_name = obj.__class__.__name__.lower()
 
 
-class PerInstanceSearchView(SearchView):
-    def __init__(self, *args, **kwargs):
-        super(PerInstanceSearchView, self).__init__(*args, **kwargs)
-        self.form_class = PerInstanceSearchForm
-        self.template = 'nuntium/instance_search.html'
+_RESULTS_PER_PAGE = 20
 
-    def __call__(self, *args, **kwargs):
-        request = args[0]
-        self.slug = request.subdomain
-        return super(PerInstanceSearchView, self).__call__(*args, **kwargs)
 
-    def build_form(self, form_kwargs=None):
-        self.writeitinstance = WriteItInstance.objects.get(slug=self.slug)
-        if form_kwargs is None:
-            form_kwargs = {}
-        form_kwargs['writeitinstance'] = self.writeitinstance
+class MessageSearchView(View):
+    template_name = 'nuntium/search.html'
 
-        return super(PerInstanceSearchView, self).build_form(form_kwargs)
+    def get(self, request, *args, **kwargs):
+        form = MessageSearchForm(request.GET)
+        query = ''
+        results = []
+        if form.is_valid():
+            query = form.cleaned_data.get('q', '')
+            if query:
+                messages = Message.public_objects.filter(
+                    Q(subject__icontains=query) | Q(content__icontains=query)
+                )
+                answers = Answer.objects.filter(
+                    message__in=Message.public_objects.all()
+                ).filter(
+                    Q(content__icontains=query) | Q(person__name__icontains=query)
+                )
+                results = [_SearchResult(m) for m in messages]
+                results += [_SearchResult(a) for a in answers]
+        paginator = Paginator(results, _RESULTS_PER_PAGE)
+        try:
+            page = paginator.page(request.GET.get('page', 1))
+        except (EmptyPage, PageNotAnInteger):
+            page = paginator.page(1)
+        return render(request, self.template_name, {
+            'form': form,
+            'query': query,
+            'page': page,
+        })
+
+
+class PerInstanceSearchView(View):
+    template_name = 'nuntium/instance_search.html'
+
+    def get(self, request, *args, **kwargs):
+        writeitinstance = get_object_or_404(WriteItInstance, slug=request.subdomain)
+        form = PerInstanceSearchForm(request.GET, writeitinstance=writeitinstance)
+        query = ''
+        results = []
+        if form.is_valid():
+            query = form.cleaned_data.get('q', '')
+            if query:
+                public_messages = Message.public_objects.filter(
+                    writeitinstance=writeitinstance
+                )
+                messages = public_messages.filter(
+                    Q(subject__icontains=query) | Q(content__icontains=query)
+                )
+                answers = Answer.objects.filter(
+                    message__in=public_messages
+                ).filter(
+                    Q(content__icontains=query) | Q(person__name__icontains=query)
+                )
+                results = [_SearchResult(m) for m in messages]
+                results += [_SearchResult(a) for a in answers]
+        paginator = Paginator(results, _RESULTS_PER_PAGE)
+        try:
+            page = paginator.page(request.GET.get('page', 1))
+        except (EmptyPage, PageNotAnInteger):
+            page = paginator.page(1)
+        return render(request, self.template_name, {
+            'form': form,
+            'query': query,
+            'page': page,
+        })
 
 
 class MessagesPerPersonView(ListView):

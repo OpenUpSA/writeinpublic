@@ -127,7 +127,7 @@ urlpatterns = i18n_patterns('',
     url(r'^from/(?P<message_slug>[-\w]+)/?$', MessagesFromPersonView.as_view(), name='all-messages-from-the-same-author-as'),
     url(r'^to/(?P<pk>[-\d]+)/$', MessagesPerPersonView.as_view(), name='thread_to'),
 
-    url(r'^search/$', PerInstanceSearchView(), name='instance_search'),
+    url(r'^search/$', PerInstanceSearchView.as_view(), name='instance_search'),
     url(r'^attachment/(?P<pk>[-\d]+)/$', download_attachment_view, name='attachment'),
     url(r'^manage/', include(managepatterns)),
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', kwargs={'next_page': '/'}, name='logout'),

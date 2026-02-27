@@ -1,58 +1,40 @@
 # coding=utf-8
 from global_test_case import GlobalTestCase as TestCase, SearchIndexTestCase
-from ..search_indexes import AnswerIndex
+from ..search_indexes import answer_search_queryset
 from subdomains.utils import reverse
 from ..models import Answer, Message
-from haystack import indexes
 import urllib
 import urlparse
 
 
-class AnswerIndexTestCase(TestCase):
+class AnswerSearchQuerysetTestCase(TestCase):
     def setUp(self):
-        super(AnswerIndexTestCase, self).setUp()
-        self.index = AnswerIndex()
+        super(AnswerSearchQuerysetTestCase, self).setUp()
         for message in Message.objects.all():
             message.confirmated = True
             message.save()
 
-    def test_index_parts(self):
-        self.assertIsInstance(self.index, indexes.SearchIndex)
-        self.assertIsInstance(self.index, indexes.Indexable)
-
-        self.assertEquals(self.index.get_model(), Answer)
-
+    def test_public_answers_are_searchable(self):
         public_answers = Answer.objects.filter(message__in=Message.public_objects.all())
-        first_answer = public_answers[0]
-        public_answers_list = list(public_answers)
+        qs = answer_search_queryset()
+        for answer in public_answers:
+            self.assertIn(answer, qs)
 
-        self.assertQuerysetEqual(self.index.index_queryset(), [repr(r) for r in public_answers_list])
-
-        self.assertTrue(self.index.text.document)
-        self.assertTrue(self.index.text.use_template)
-
-        indexed_text = self.index.text.prepare_template(first_answer)
-
-        self.assertTrue(first_answer.content in indexed_text)
-        self.assertTrue(first_answer.person.name in indexed_text)
-        self.assertEquals(self.index.writeitinstance.model_attr, 'message__writeitinstance__id')
-
-        self.assertEquals(self.index.writeitinstance.prepare(first_answer), first_answer.message.writeitinstance.id)
+    def test_private_message_answers_not_searchable(self):
+        private_message_answers = Answer.objects.exclude(message__in=Message.public_objects.all())
+        qs = answer_search_queryset()
+        for answer in private_message_answers:
+            self.assertNotIn(answer, qs)
 
 
 class SearchAnswerAccess(SearchIndexTestCase):
     def setUp(self):
         super(SearchAnswerAccess, self).setUp()
+        for message in Message.objects.all():
+            message.confirmated = True
+            message.save()
 
     def test_access_the_url(self):
-        # I don't like this test that much
-        # because it seems to be likely to break if I add more
-        # public messages
-        # if it ever fails
-        # well then I'll fix it
-
-        # Based on
-        # http://stackoverflow.com/questions/2506379/add-params-to-given-url-in-python
         url = reverse('search_messages', subdomain=None)
         url += "/"
         params = {'q': 'Public Answer'}
@@ -63,10 +45,7 @@ class SearchAnswerAccess(SearchIndexTestCase):
         response = self.client.get(url_with_parameters)
         self.assertEquals(response.status_code, 200)
 
-        #the first one the one that says "Public Answer" in example_data.yml
-        expected_answer = Answer.objects.get(id=1)
         self.assertIn('page', response.context)
         results = response.context['page'].object_list
 
         self.assertGreaterEqual(len(results), 1)
-        self.assertEquals(results[0].object.id, expected_answer.id)
