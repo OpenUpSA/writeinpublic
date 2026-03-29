@@ -41,7 +41,7 @@ flufl.bounce==2.3
 futures==3.0.5
 gevent==1.4.0
 greenlet==1.1.2
-gunicorn==19.10.0
+gunicorn==22.0.0
 idna==2.1
 ipaddress==1.0.16
 Khayyam==3.0.15
