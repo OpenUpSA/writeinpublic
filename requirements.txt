@@ -78,7 +78,7 @@ static==0.4
 static3==0.7.0
 transifex-client==0.12.1
 Unidecode==0.4.19
-urllib3==1.16
+urllib3==1.26.19
 vcrpy==1.4.0
 wrapt==1.10.8
 zope.interface==4.2.0
